@@ -1,32 +1,30 @@
-/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Net;
-using System.Text;
-using uPLibrary.Networking.M2Mqtt;
+// <copyright file="MqttClientHelper.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scripting
 {
+    using System;
+    using System.Net;
+    using System.Text;
+    using uPLibrary.Networking.M2Mqtt;
+
     public class MqttEndPoint
     {
         public string Address = "127.0.0.1";
@@ -45,7 +43,8 @@ namespace HomeGenie.Automation.Scripting
         private MqttEndPoint endPoint = new MqttEndPoint();
 
         private MqttClient mqttClient = null;
-        //private object mqttSyncLock = new object();
+
+        // private object mqttSyncLock = new object();
 
         /// <summary>
         /// Sets the MQTT server to use.
@@ -80,7 +79,7 @@ namespace HomeGenie.Automation.Scripting
             Connect();
             return this;
         }
-        
+
         /// <summary>
         /// Connects to the MQTT server using the specified port and client identifier and a callback function in case of lost connection.
         /// </summary>
@@ -109,7 +108,7 @@ namespace HomeGenie.Automation.Scripting
 
             return this;
         }
-        
+
         /// <summary>
         /// Disconnects from the MQTT server.
         /// </summary>
@@ -119,6 +118,7 @@ namespace HomeGenie.Automation.Scripting
             {
                 this.mqttClient.Disconnect();
             }
+
             return this;
         }
 
@@ -127,7 +127,7 @@ namespace HomeGenie.Automation.Scripting
         /// </summary>
         /// <param name="topic">Topic name.</param>
         /// <param name="callback">Callback for receiving the subscribed topic messages.</param>
-        public MqttClientHelper Subscribe(string topic, Action<string,string> callback)
+        public MqttClientHelper Subscribe(string topic, Action<string, string> callback)
         {
             mqttClient.MqttMsgPublishReceived += (sender, e) =>
             {
@@ -153,6 +153,7 @@ namespace HomeGenie.Automation.Scripting
             {
                 throw new Exception("Mqtt not connected when publishing");
             }
+
             return this;
         }
 
@@ -168,6 +169,7 @@ namespace HomeGenie.Automation.Scripting
             {
                 throw new Exception("Mqtt not connected when publishing");
             }
+
             return this;
         }
 
@@ -190,8 +192,6 @@ namespace HomeGenie.Automation.Scripting
             Disconnect();
         }
 
-        #region private helper methods
-
         private void Connect()
         {
             Disconnect();
@@ -206,8 +206,5 @@ namespace HomeGenie.Automation.Scripting
                 mqttClient.Connect(endPoint.ClientId);
             }
         }
-
-        #endregion
-
     }
 }

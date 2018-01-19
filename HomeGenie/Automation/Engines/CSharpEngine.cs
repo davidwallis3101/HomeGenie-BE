@@ -1,42 +1,42 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE 
- */
-
-using System;
-using System.Reflection;
-using HomeGenie.Service;
-using HomeGenie.Service.Constants;
-using System.IO;
-using System.Collections.Generic;
-using HomeGenie.Automation.Scripting;
-using System.Diagnostics;
+﻿// <copyright file="CSharpEngine.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Engines
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Reflection;
+    using HomeGenie.Automation.Scripting;
+    using HomeGenie.Service;
+    using HomeGenie.Service.Constants;
+
     public class CSharpEngine : ProgramEngineBase, IProgramEngine
     {
         // c# program fields
         private AppDomain _programDomain = null;
         private Type _assemblyType = null;
+#pragma warning disable SA1121 // Use built-in type alias
         private Object _scriptInstance = null;
+#pragma warning restore SA1121 // Use built-in type alias
         private MethodInfo _methodRun = null;
         private MethodInfo _methodReset = null;
         private MethodInfo _methodEvaluateCondition = null;
@@ -44,9 +44,10 @@ namespace HomeGenie.Automation.Engines
 
         private static bool _isShadowCopySet = false;
 
-        public CSharpEngine(ProgramBlock pb) : base(pb) 
+        public CSharpEngine(ProgramBlock pb)
+            : base(pb)
         {
-            // TODO: SetShadowCopyPath/SetShadowCopyFiles methods are deprecated... 
+            // TODO: SetShadowCopyPath/SetShadowCopyFiles methods are deprecated...
             // TODO: create own AppDomain for "programDomain" instead of using CurrentDomain
             // TODO: and use AppDomainSetup to set shadow copy for each app domain
             // TODO: !!! verify AppDomain compatibility with mono !!!
@@ -66,6 +67,7 @@ namespace HomeGenie.Automation.Engines
             {
                 ProgramBlock.ScriptErrors = "Program update is required.";
             }
+
             return success;
         }
 
@@ -77,11 +79,15 @@ namespace HomeGenie.Automation.Engines
             if (_programDomain != null)
             {
                 // Unloading program app domain...
-                try { AppDomain.Unload(_programDomain); }
+                try
+                {
+                    AppDomain.Unload(_programDomain);
+                }
                 catch
                 {
                     // ignored
                 }
+
                 _programDomain = null;
             }
         }
@@ -114,7 +120,6 @@ namespace HomeGenie.Automation.Engines
                 HomeGenieService.LogError(ex);
             }
 
-
             // DO NOT CHANGE THE FOLLOWING LINES OF CODE
             // it is a lil' trick for mono compatibility
             // since it will be caching the assembly when using the same name
@@ -136,16 +141,18 @@ namespace HomeGenie.Automation.Engines
                 var sourceLines = ProgramBlock.ScriptSource.Split('\n').Length;
                 foreach (System.CodeDom.Compiler.CompilerError error in result.Errors)
                 {
-                    var errorRow = (error.Line - CSharpAppFactory.ProgramCodeOffset);
+                    var errorRow = error.Line - CSharpAppFactory.ProgramCodeOffset;
                     var blockType = CodeBlockEnum.CR;
                     if (errorRow >= sourceLines + CSharpAppFactory.ConditionCodeOffset)
                     {
-                        errorRow -= (sourceLines + CSharpAppFactory.ConditionCodeOffset);
+                        errorRow -= sourceLines + CSharpAppFactory.ConditionCodeOffset;
                         blockType = CodeBlockEnum.TC;
                     }
+
                     if (!error.IsWarning)
                     {
-                        errors.Add(new ProgramError {
+                        errors.Add(new ProgramError
+                        {
                             Line = errorRow,
                             Column = error.Column,
                             ErrorMessage = error.ErrorText,
@@ -162,27 +169,32 @@ namespace HomeGenie.Automation.Engines
             }
 
             if (errors.Count != 0)
+            {
                 return errors;
+            }
 
             // move/copy new assembly files
             // rename temp file to production file
             _scriptAssembly = result.CompiledAssembly;
             try
             {
-                //string tmpfile = new Uri(value.CodeBase).LocalPath;
+                // string tmpfile = new Uri(value.CodeBase).LocalPath;
                 File.Move(tmpfile, this.AssemblyFile);
                 if (File.Exists(tmpfile + ".mdb"))
                 {
                     File.Move(tmpfile + ".mdb", this.AssemblyFile + ".mdb");
                 }
+
                 if (File.Exists(tmpfile.Replace(".dll", ".mdb")))
                 {
                     File.Move(tmpfile.Replace(".dll", ".mdb"), this.AssemblyFile.Replace(".dll", ".mdb"));
                 }
+
                 if (File.Exists(tmpfile + ".pdb"))
                 {
                     File.Move(tmpfile + ".pdb", this.AssemblyFile + ".pdb");
                 }
+
                 if (File.Exists(tmpfile.Replace(".dll", ".pdb")))
                 {
                     File.Move(tmpfile.Replace(".dll", ".pdb"), this.AssemblyFile.Replace(".dll", ".pdb"));
@@ -204,6 +216,7 @@ namespace HomeGenie.Automation.Engines
                 result = (MethodRunResult)_methodEvaluateCondition.Invoke(_scriptInstance, null);
                 result.ReturnValue = (bool)result.ReturnValue || ProgramBlock.WillRun;
             }
+
             return result;
         }
 
@@ -214,6 +227,7 @@ namespace HomeGenie.Automation.Engines
             {
                 result = (MethodRunResult)_methodRun.Invoke(_scriptInstance, new object[1] { options });
             }
+
             return result;
         }
 
@@ -225,10 +239,10 @@ namespace HomeGenie.Automation.Engines
             }
         }
 
-
         public ProgramError GetFormattedError(Exception e, bool isTriggerBlock)
         {
-            var error = new ProgramError() {
+            var error = new ProgramError()
+            {
                 CodeBlock = isTriggerBlock ? CodeBlockEnum.TC : CodeBlockEnum.CR,
                 Column = 0,
                 Line = 0,
@@ -240,15 +254,15 @@ namespace HomeGenie.Automation.Engines
             if (isTriggerBlock)
             {
                 var sourceLines = ProgramBlock.ScriptSource.Split('\n').Length;
-                error.Line -=  (CSharpAppFactory.ConditionCodeOffset + CSharpAppFactory.ProgramCodeOffset + sourceLines);
+                error.Line -= CSharpAppFactory.ConditionCodeOffset + CSharpAppFactory.ProgramCodeOffset + sourceLines;
             }
             else
             {
-                error.Line -=  CSharpAppFactory.ProgramCodeOffset;
+                error.Line -= CSharpAppFactory.ProgramCodeOffset;
             }
+
             return error;
         }
-
 
         internal string AssemblyFile
         {
@@ -263,7 +277,9 @@ namespace HomeGenie.Automation.Engines
         internal bool LoadAssembly()
         {
             if (ProgramBlock.Type.ToLower() != "csharp")
+            {
                 return false;
+            }
 
             try
             {
@@ -277,6 +293,7 @@ namespace HomeGenie.Automation.Engines
                 {
                     debugData = File.ReadAllBytes(this.AssemblyFile + ".pdb");
                 }
+
                 _scriptAssembly = debugData != null
                     ? Assembly.Load(assemblyData, debugData)
                     : Assembly.Load(assemblyData);
@@ -310,6 +327,7 @@ namespace HomeGenie.Automation.Engines
                     miSetHost.Invoke(_scriptInstance, new object[2] { Homegenie, ProgramBlock.Address });
 
                     _methodRun = _assemblyType.GetMethod("Run", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+
                     // TODO: v1.1 !!!IMPORTANT!!! the method EvaluateCondition will be renamed to EvaluateStartupCode,
                     // TODO: v1.1 !!!IMPORTANT!!! so if EvaluateCondition is not found look for EvaluateStartupCode method instead
                     _methodEvaluateCondition = _assemblyType.GetMethod("EvaluateCondition", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
@@ -324,14 +342,11 @@ namespace HomeGenie.Automation.Engines
                         ProgramBlock.Address.ToString(),
                         ex.Message,
                         "Exception.StackTrace",
-                        ex.StackTrace
-                    );
+                        ex.StackTrace);
                 }
             }
+
             return success;
         }
-
-
     }
 }
-

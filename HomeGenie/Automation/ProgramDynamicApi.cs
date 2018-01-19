@@ -1,32 +1,30 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using MIG;
+﻿// <copyright file="ProgramDynamicApi.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using MIG;
+
     public static class ProgramDynamicApi
     {
         private static Dictionary<string, Func<object, object>> dynamicApi = new Dictionary<string, Func<object, object>>();
@@ -38,8 +36,10 @@ namespace HomeGenie
             {
                 handler = dynamicApi[request];
             }
+
             return handler;
         }
+
         public static Func<object, object> FindMatching(string request)
         {
             Func<object, object> handler = null;
@@ -51,8 +51,10 @@ namespace HomeGenie
                     break;
                 }
             }
+
             return handler;
         }
+
         public static void Register(string request, Func<object, object> handlerfn)
         {
             if (dynamicApi.ContainsKey(request))
@@ -64,6 +66,7 @@ namespace HomeGenie
                 dynamicApi.Add(request, handlerfn);
             }
         }
+
         public static void UnRegister(string request)
         {
             if (dynamicApi.ContainsKey(request))
@@ -74,8 +77,9 @@ namespace HomeGenie
 
         public static object TryApiCall(MigInterfaceCommand command)
         {
-            object response = "";
-            // Dynamic Interface API 
+            object response = string.Empty;
+
+            // Dynamic Interface API
             var registeredApi = command.Domain + "/" + command.Address + "/" + command.Command;
             var handler = ProgramDynamicApi.Find(registeredApi);
             if (handler != null)
@@ -95,9 +99,8 @@ namespace HomeGenie
                     response = handler(command.OriginalRequest.Trim('/'));
                 }
             }
+
             return response;
         }
-
     }
 }
-

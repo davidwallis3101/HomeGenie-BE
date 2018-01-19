@@ -1,35 +1,30 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
-*     Author: Generoso Martello <gene@homegenie.it>
-*     Project Homepage: http://github.com/Bounz/HomeGenie-BE
-*/
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO.Ports;
-
-using SerialPortLib;
+﻿// <copyright file="SerialPortHelper.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scripting
 {
+    using System;
+    using System.IO.Ports;
+    using System.Text;
+    using SerialPortLib;
+
     /// <summary>
     /// Serial port helper.\n
     /// Class instance accessor: **SerialPort**
@@ -41,9 +36,9 @@ namespace HomeGenie.Automation.Scripting
         private Action<byte[]> dataReceived;
         private Action<string> stringReceived;
         private Action<bool> statusChanged;
-        private string portName = "";
+        private string portName = string.Empty;
         private string[] textEndOfLine = new string[] { "\n" };
-        private string textBuffer = "";
+        private string textBuffer = string.Empty;
 
         public SerialPortHelper()
         {
@@ -75,7 +70,7 @@ namespace HomeGenie.Automation.Scripting
         /// <param name="baudRate">Baud rate.</param>
         /// <param name="stopBits">Stop Bits.</param>
         /// <param name="parity">Parity.</param>
-        /// 
+        ///
         public bool Connect(int baudRate, StopBits stopBits = StopBits.One, Parity parity = Parity.None)
         {
             serialPort.MessageReceived += SerialPort_MessageReceived;
@@ -180,25 +175,41 @@ namespace HomeGenie.Automation.Scripting
             {
                 dataReceived(args.Data);
             }
+
             if (stringReceived != null)
             {
                 string textMessage = textBuffer + Encoding.UTF8.GetString(args.Data);
-                if (String.IsNullOrEmpty(textEndOfLine[0]))
+                if (string.IsNullOrEmpty(textEndOfLine[0]))
                 {
                     // raw string receive
-                    try { stringReceived(textMessage); } catch { }
+                    try
+                    {
+                        stringReceived(textMessage);
+                    }
+
+                    //// raw string receive
+                    catch
+                    {
+                    }
                 }
                 else
                 {
                     // text line based string receive
-                    textBuffer = "";
+                    textBuffer = string.Empty;
                     if (textMessage.Contains(textEndOfLine[0]))
                     {
                         string[] lines = textMessage.Split(textEndOfLine, StringSplitOptions.RemoveEmptyEntries);
                         for (int l = 0; l < lines.Length - (textMessage.EndsWith(textEndOfLine[0]) ? 0 : 1); l++)
                         {
-                            try { stringReceived(lines[l]); } catch { }
+                            try
+                            {
+                                stringReceived(lines[l]);
+                            }
+                            catch
+                            {
+                            }
                         }
+
                         if (!textMessage.EndsWith(textEndOfLine[0]))
                         {
                             textBuffer = lines[lines.Length - 1];
@@ -215,17 +226,23 @@ namespace HomeGenie.Automation.Scripting
         private void SerialPort_ConnectionStatusChanged(object sender, ConnectionStatusChangedEventArgs args)
         {
             // send last received text buffer before disconnecting
-            if (!args.Connected && !String.IsNullOrEmpty(textBuffer))
+            if (!args.Connected && !string.IsNullOrEmpty(textBuffer))
             {
-                try { stringReceived(textBuffer); } catch { }
+                try
+                {
+                    stringReceived(textBuffer);
+                }
+                catch
+                {
+                }
             }
+
             // reset text receive buffer
-            textBuffer = "";
+            textBuffer = string.Empty;
             if (statusChanged != null)
             {
                 statusChanged(args.Connected);
             }
         }
-
     }
 }

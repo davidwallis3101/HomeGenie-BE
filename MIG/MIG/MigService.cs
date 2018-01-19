@@ -1,104 +1,91 @@
-﻿/*
-    This file is part of MIG Project source code.
-
-    MIG is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    MIG is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with MIG.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: https://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-using MIG.Config;
-using NLog;
-using System.Reflection;
+﻿// <copyright file="MigService.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace MIG
 {
-    
-    #region Event delegates
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using MIG.Config;
+    using NLog;
 
     /// <summary>
     /// Pre process request event handler.
     /// </summary>
     public delegate void PreProcessRequestEventHandler(object sender, ProcessRequestEventArgs args);
+
     /// <summary>
     /// Post process request event handler.
     /// </summary>
     public delegate void PostProcessRequestEventHandler(object sender, ProcessRequestEventArgs args);
+
     /// <summary>
     /// Interface property changed event handler.
     /// </summary>
     public delegate void InterfacePropertyChangedEventHandler(object sender, InterfacePropertyChangedEventArgs args);
+
     /// <summary>
     /// Interface modules changed event handler.
     /// </summary>
     public delegate void InterfaceModulesChangedEventHandler(object sender, InterfaceModulesChangedEventArgs args);
+
     /// <summary>
     /// Option changed event handler.
     /// </summary>
     public delegate void OptionChangedEventHandler(object sender, OptionChangedEventArgs args);
 
-    #endregion
-
     public class MigService
     {
-
-        #region Private fields
-
         private MigServiceConfiguration configuration;
         private DynamicApi dynamicApi;
-
-        #endregion
-
-        #region Public events and fields
-
         public static Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Occurs on gateway request pre process.
         /// </summary>
         public event PreProcessRequestEventHandler GatewayRequestPreProcess;
+
         /// <summary>
         /// Occurs on gateway request post process.
         /// </summary>
         public event PostProcessRequestEventHandler GatewayRequestPostProcess;
+
         /// <summary>
         /// Occurs when interface property changed.
         /// </summary>
         public event InterfacePropertyChangedEventHandler InterfacePropertyChanged;
+
         /// <summary>
         /// Occurs when interface modules changed.
         /// </summary>
         public event InterfaceModulesChangedEventHandler InterfaceModulesChanged;
 
-        //TODO: add more events....
-        //public event -- ServiceStarted;
-        //public event -- ServiceStopped;
+        // TODO: add more events....
+        // public event -- ServiceStarted;
+        // public event -- ServiceStopped;
 
         // TODO: use List instead of Dictionary...
         public readonly List<IMigGateway> Gateways;
         public readonly List<MigInterface> Interfaces;
-
-        #endregion
-
-        #region Lifecycle
 
         public MigService()
         {
@@ -126,6 +113,7 @@ namespace MIG
                         success = false;
                     }
                 }
+
                 // Initialize MIG Interfaces
                 foreach (Interface iface in configuration.Interfaces)
                 {
@@ -144,6 +132,7 @@ namespace MIG
                 MigService.Log.Error(e);
                 success = false;
             }
+
             return success;
         }
 
@@ -159,17 +148,15 @@ namespace MIG
                 migInterface.IsEnabled = false;
                 migInterface.Disconnect();
             }
+
             foreach (var gw in Gateways)
             {
                 Log.Debug("Stopping Gateway {0}", gw.GetName());
                 gw.Stop();
             }
+
             Log.Debug("Stopped MigService");
         }
-
-        #endregion
-
-        #region Public members
 
         /// <summary>
         /// Gets or sets the configuration.
@@ -177,25 +164,33 @@ namespace MIG
         /// <value>The configuration.</value>
         public MigServiceConfiguration Configuration
         {
-            get { return configuration; }
+            get
+            {
+                return configuration;
+            }
+
             set
             {
                 // TODO: SHOULD DISPOSE PREVIOUS CONFIG AND ALLOCATED OBJECTS!!
                 configuration = value;
+
                 // Create MIG Gateways
                 for (int g = 0; g < configuration.Gateways.Count; g++)
                 {
                     var gwConfig = configuration.Gateways[g];
                     var gateway = AddGateway(gwConfig.Name);
-//                    if (gateway != null && gwConfig.IsEnabled)
+
+// if (gateway != null && gwConfig.IsEnabled)
 //                        gateway.Start();
                 }
+
                 // Create MIG interfaces
                 for (int i = 0; i < configuration.Interfaces.Count; i++)
                 {
                     var ifConfig = configuration.Interfaces[i];
                     var migInterface = AddInterface(ifConfig.Domain, ifConfig.AssemblyName);
-//                    if (migInterface != null && ifConfig.IsEnabled)
+
+// if (migInterface != null && ifConfig.IsEnabled)
 //                        migInterface.Connect();
                 }
             }
@@ -231,6 +226,7 @@ namespace MIG
                 {
                     MigService.Log.Error(e);
                 }
+
                 if (migGateway != null)
                 {
                     Log.Debug("Adding Gateway {0}", migGateway.GetName());
@@ -239,6 +235,7 @@ namespace MIG
                     migGateway.PostProcessRequest += Gateway_PostProcessRequest;
                 }
             }
+
             // Try loading gateway settings from MIG configuration
             var config = configuration.GetGateway(migGateway.GetName());
             if (config == null)
@@ -246,9 +243,13 @@ namespace MIG
                 config = new Gateway();
                 config.Name = migGateway.GetName();
                 if (config.Options == null)
+                {
                     config.Options = new List<Option>();
+                }
+
                 configuration.Gateways.Add(config);
             }
+
             if (migGateway != null)
             {
                 Log.Debug("Setting Gateway options");
@@ -258,6 +259,7 @@ namespace MIG
                     migGateway.SetOption(opt.Name, opt.Value);
                 }
             }
+
             return migGateway;
         }
 
@@ -285,16 +287,19 @@ namespace MIG
                 try
                 {
                     var type = TypeLookup("MIG.Interfaces." + domain, assemblyName);
-                    if(type == null){
+                    if (type == null)
+                    {
                         MigService.Log.Error("Can't find type for Mig Interface with domain {0} (assemblyName={1})", domain, assemblyName);
                         return null;
-                    }                        
+                    }
+
                     migInterface = (MigInterface)Activator.CreateInstance(type);
                 }
                 catch (Exception e)
                 {
                     MigService.Log.Error(e);
                 }
+
                 if (migInterface != null)
                 {
                     var interfaceVersion = VersionLookup(assemblyName);
@@ -304,6 +309,7 @@ namespace MIG
                     migInterface.InterfacePropertyChanged += MigService_InterfacePropertyChanged;
                 }
             }
+
             // Try loading interface settings from MIG configuration
             var config = configuration.GetInterface(domain);
             if (config == null)
@@ -311,9 +317,13 @@ namespace MIG
                 config = new Interface();
                 config.Domain = domain;
                 if (config.Options == null)
+                {
                     config.Options = new List<Option>();
+                }
+
                 configuration.Interfaces.Add(config);
             }
+
             if (migInterface != null)
             {
                 Log.Debug("Setting Interface options");
@@ -323,6 +333,7 @@ namespace MIG
                     migInterface.SetOption(opt.Name, opt.Value);
                 }
             }
+
             return migInterface;
         }
 
@@ -366,6 +377,7 @@ namespace MIG
             {
                 Log.Debug("Interface not found {0}", domain);
             }
+
             return migInterface;
         }
 
@@ -388,6 +400,7 @@ namespace MIG
             {
                 Log.Debug("Interface not found {0}", domain);
             }
+
             return migInterface;
         }
 
@@ -438,8 +451,6 @@ namespace MIG
             dynamicApi.Register(basePath, callback);
         }
 
-        #region public Static Utility methods
-
         public static string JsonSerialize(object data, bool indent = false)
         {
             return Utility.Serialization.JsonSerialize(data, indent);
@@ -457,7 +468,7 @@ namespace MIG
             {
                 process.Start();
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 Log.Error(e);
             }
@@ -466,7 +477,7 @@ namespace MIG
         public static Type TypeLookup(string typeName, string assemblyName)
         {
             Type type = null;
-            if (!String.IsNullOrWhiteSpace(assemblyName))
+            if (!string.IsNullOrWhiteSpace(assemblyName))
             {
                 Assembly assembly = null;
                 try
@@ -474,23 +485,24 @@ namespace MIG
                     assembly = AppDomain.CurrentDomain.Load(Path.GetFileNameWithoutExtension(assemblyName));
                 }
                 catch
-                { 
+                {
                     try
                     {
                         assembly = Assembly.LoadFrom(Path.Combine("lib", "mig", assemblyName));
                     }
                     catch
-                    { 
+                    {
                         try
                         {
                             assembly = Assembly.LoadFrom(Path.Combine("lib", assemblyName));
                         }
                         catch
-                        { 
+                        {
                             assembly = Assembly.LoadFrom(Path.Combine(assemblyName));
                         }
                     }
                 }
+
                 if (assembly != null)
                 {
                     type = (Type)assembly.GetType(typeName);
@@ -500,13 +512,16 @@ namespace MIG
             {
                 type = Type.GetType(typeName);
             }
+
             return type;
         }
 
         public static Version VersionLookup(string assemblyName)
         {
-
-            if (string.IsNullOrWhiteSpace(assemblyName)) return null;
+            if (string.IsNullOrWhiteSpace(assemblyName))
+            {
+                return null;
+            }
 
             Assembly assembly;
             try
@@ -531,6 +546,7 @@ namespace MIG
                     }
                 }
             }
+
             return assembly?.GetName().Version;
         }
 
@@ -542,21 +558,14 @@ namespace MIG
             return Path.GetDirectoryName(path);
         }
 
-        #endregion
-
-        #endregion
-
-        #region Private members
-
-        #region Utility methods
-
         private object TryDynamicApi(MigClientRequest request)
         {
             object response = null;
             var command = request.Command;
             var apiCommand = command.Domain + "/" + command.Address + "/" + command.Command;
+
             // Standard MIG API commands should respect the the form
-            // <domain>/<address>/<command>[/<option_1>/../<option_n>] 
+            // <domain>/<address>/<command>[/<option_1>/../<option_n>]
             var handler = dynamicApi.FindExact(apiCommand);
             if (handler == null)
             {
@@ -564,11 +573,13 @@ namespace MIG
                 // to just find any dynamic API that starts with the requested url
                 handler = dynamicApi.FindMatching(command.OriginalRequest.Trim('/'));
             }
+
             if (handler != null)
             {
                 // We found an handler for this API call, so invoke it
                 response = handler(request);
             }
+
             // TODO: the following is old code used for HomeGenie, move to HG
             /*
             if (handler != null)
@@ -592,10 +603,6 @@ namespace MIG
             return response;
         }
 
-        #endregion
-
-        #region MigInterface events
-
         private void MigService_InterfacePropertyChanged(object sender, InterfacePropertyChangedEventArgs args)
         {
             // event propagation
@@ -610,18 +617,17 @@ namespace MIG
             OnInterfaceModulesChanged(sender, args);
         }
 
-        #endregion
-
-        #region MigGateway events
-
         private void Gateway_PreProcessRequest(object sender, ProcessRequestEventArgs args)
         {
             var request = args.Request;
+
             // Route event
             OnPreProcessRequest(sender, request);
 
             if (request.Handled)
+            {
                 return;
+            }
 
             var command = request.Command;
             if (command.Domain == "MIGService.Interfaces")
@@ -633,17 +639,26 @@ namespace MIG
                     if (command.GetOption(0) == "1")
                     {
                         if (EnableInterface(command.Address) != null)
-                            request.ResponseData = new ResponseStatus(Status.Ok, String.Format("Interface {0} enabled", command.Address));
+                        {
+                            request.ResponseData = new ResponseStatus(Status.Ok, $"Interface {command.Address} enabled");
+                        }
                         else
-                            request.ResponseData = new ResponseStatus(Status.Error, String.Format("Interface {0} not found", command.Address));
+                        {
+                            request.ResponseData = new ResponseStatus(Status.Error, $"Interface {command.Address} not found");
+                        }
                     }
                     else
                     {
                         if (DisableInterface(command.Address) != null)
-                            request.ResponseData = new ResponseStatus(Status.Ok, String.Format("Interface {0} disabled", command.Address));
+                        {
+                            request.ResponseData = new ResponseStatus(Status.Ok, $"Interface {command.Address} disabled");
+                        }
                         else
-                            request.ResponseData = new ResponseStatus(Status.Error, String.Format("Interface {0} not found", command.Address));
+                        {
+                            request.ResponseData = new ResponseStatus(Status.Error, $"Interface {command.Address} not found");
+                        }
                     }
+
                     OnInterfacePropertyChanged(sender, new InterfacePropertyChangedEventArgs("MIGService.Interfaces", command.Address, "MIG Interface", "Status.IsEnabled", command.GetOption(0)));
                     break;
                 case "IsEnabled.Get":
@@ -655,13 +670,14 @@ namespace MIG
                         if (iface != null)
                         {
                             iface.SetOption(command.GetOption(0), command.GetOption(1));
-                            request.ResponseData = new ResponseStatus(Status.Ok, String.Format("{0} option '{1}' set to '{2}'", command.Address, command.GetOption(0), command.GetOption(1)));
+                            request.ResponseData = new ResponseStatus(Status.Ok, $"{command.Address} option '{command.GetOption(0)}' set to '{command.GetOption(1)}'");
                         }
                         else
                         {
-                            request.ResponseData = new ResponseStatus(Status.Error, String.Format("Interface {0} not found", command.Address));
+                            request.ResponseData = new ResponseStatus(Status.Error, $"Interface {command.Address} not found");
                         }
                     }
+
                     OnInterfacePropertyChanged(sender, new InterfacePropertyChangedEventArgs("MIGService.Interfaces", command.Address, "MIG Interface", "Options." + command.GetOption(0), command.GetOption(1)));
                     break;
                 case "Options.Get":
@@ -674,9 +690,10 @@ namespace MIG
                         }
                         else
                         {
-                            request.ResponseData = new ResponseStatus(Status.Error, String.Format("Interface {0} not found", command.Address));
+                            request.ResponseData = new ResponseStatus(Status.Error, $"Interface {command.Address} not found");
                         }
                     }
+
                     break;
                 default:
                     break;
@@ -688,57 +705,51 @@ namespace MIG
                 var iface = (from miginterface in Interfaces
                     let ns = miginterface.GetType().Namespace
                     let domain = ns.Substring(ns.LastIndexOf(".") + 1) + "." + miginterface.GetType().Name
-                    where (command.Domain != null && command.Domain.StartsWith(domain))
+                    where command.Domain != null && command.Domain.StartsWith(domain)
                     select miginterface).FirstOrDefault();
-                if (iface != null) // && iface.IsEnabled)
+
+                if (iface != null)
                 {
-                    //if (iface.IsConnected)
-                    //{
-                        try
-                        {
-                            request.ResponseData = iface.InterfaceControl(command);
-                        }
-                        catch (Exception ex)
-                        {
-                            request.ResponseData = new ResponseStatus(Status.Error, MigService.JsonSerialize(ex));
-                        }
-                    //}
-                    //else
-                    //{
-                    //    request.ResponseData = new ResponseStatus(Status.Error, String.Format("Interface '{0}' not connected", iface.GetDomain()));
-                    //}
+                    try
+                    {
+                        request.ResponseData = iface.InterfaceControl(command);
+                    }
+                    catch (Exception ex)
+                    {
+                        request.ResponseData = new ResponseStatus(Status.Error, MigService.JsonSerialize(ex));
+                    }
                 }
+
                 // Try processing as Dynamic API
-                if ((request.ResponseData == null || request.ResponseData.Equals(String.Empty)))
+                if (request.ResponseData == null || request.ResponseData.Equals(string.Empty))
                 {
                     request.ResponseData = TryDynamicApi(request);
                 }
-
             }
-
         }
 
         private void Gateway_PostProcessRequest(object sender, ProcessRequestEventArgs args)
         {
             var request = args.Request;
+
             // Route event
             OnPostProcessRequest(sender, request);
         }
 
-        #endregion
-
-        #region MigService Events
-
         protected virtual void OnPreProcessRequest(object sender, MigClientRequest request)
         {
             if (GatewayRequestPreProcess != null)
+            {
                 GatewayRequestPreProcess(sender, new ProcessRequestEventArgs(request));
+            }
         }
 
         protected virtual void OnPostProcessRequest(object sender, MigClientRequest request)
         {
             if (GatewayRequestPostProcess != null)
+            {
                 GatewayRequestPostProcess(sender, new ProcessRequestEventArgs(request));
+            }
         }
 
         protected virtual void OnInterfaceModulesChanged(object sender, InterfaceModulesChangedEventArgs args)
@@ -757,15 +768,12 @@ namespace MIG
             {
                 InterfacePropertyChanged(sender, args);
             }
+
             // Route event to MIG.Gateways as well
             foreach (var gateway in Gateways)
+            {
                 gateway.OnInterfacePropertyChanged(sender, args);
+            }
         }
-
-        #endregion
-
-        #endregion
-
     }
-
 }

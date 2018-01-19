@@ -1,45 +1,42 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using HomeGenie.Automation;
-using HomeGenie.Automation.Scheduler;
-using HomeGenie.Data;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Timers;
-using System.Xml.Serialization;
-using System.Security.Cryptography;
-using Newtonsoft.Json.Linq;
-using System.Globalization;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
+﻿// <copyright file="UpdateChecker.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Service
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Security;
+    using System.Security.Cryptography;
+    using System.Security.Cryptography.X509Certificates;
+    using System.Timers;
+    using System.Xml.Serialization;
+    using HomeGenie.Automation;
+    using HomeGenie.Automation.Scheduler;
+    using HomeGenie.Data;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+
     [Serializable]
     public class ReleaseInfo
     {
@@ -113,7 +110,8 @@ namespace HomeGenie.Service
 
         private const string releaseFile = "release_info.xml";
         private const string githubRepository = "HomeGenie-BE";
-        private string githubReleases = String.Format("https://api.github.com/repos/Bounz/{0}/releases", githubRepository);
+        private string githubReleases = string.Format("https://api.github.com/repos/Bounz/{0}/releases", githubRepository);
+
         // TODO: deprecate this
         // This wont actually work as the server doesn't have this PHP file
         private const string endpointUrl = "http://homegenie.club/release_updates_v1_1.php";
@@ -125,30 +123,33 @@ namespace HomeGenie.Service
 
         private HomeGenieService homegenie;
 
-
         // TODO: this is just a temporary hack not meant to be used in production enviroment
         public static bool Validator(
             object sender,
             X509Certificate certificate,
             X509Chain chain,
-            SslPolicyErrors sslPolicyErrors
-        )
+            SslPolicyErrors sslPolicyErrors)
         {
             if (sslPolicyErrors == SslPolicyErrors.None)
             {
                 return true;
             }
+
             // Work-around missing certificates
             string remoteCertificateHash = certificate.GetCertHashString();
-            List<string> acceptedCertificates = new List<string>() {
+            List<string> acceptedCertificates = new List<string>()
+            {
                 // Amazon AWS github files hosting
                 "89E471D8A4977D0D9C6E67E557BF36A74A5A01DB",
+
                 // github.com
                 "D79F076110B39293E349AC89845B0380C19E2F8B",
+
                 // api.github.com
                 "CF059889CAFF8ED85E5CE0C2E4F7E6C3C750DD5C",
                 "358574EF6735A7CE406950F3C0F680CF803B2E19"
             };
+
             // try to load acceptedCertificates from file "certaccept.xml"
             try
             {
@@ -159,9 +160,13 @@ namespace HomeGenie.Service
                     acceptedCertificates.Clear();
                     acceptedCertificates.AddRange(cert);
                 }
-            } catch { }
+            }
+            catch
+            {
+            }
+
             // verify against accepted certificate hash strings
-            if (sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors 
+            if (sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors
                 && acceptedCertificates.Contains(remoteCertificateHash))
             {
                 Console.WriteLine("Applied 'SSL certificates issue' work-around.");
@@ -174,17 +179,14 @@ namespace HomeGenie.Service
             }
         }
 
-
         // TODO: add automatic interval check and "UpdateAvailable", "UpdateChecking" events
 
         public UpdateChecker(HomeGenieService hg)
         {
             homegenie = hg;
-            //
             checkInterval = new Timer(1000 * 60 * 60 * 24); // 24 hours interval between update checks
             checkInterval.AutoReset = true;
             checkInterval.Elapsed += checkInterval_Elapsed;
-            //
             remoteUpdates = new List<ReleaseInfo>();
 
             // TODO: SSL connection certificate validation:
@@ -200,15 +202,23 @@ namespace HomeGenie.Service
         public bool Check()
         {
             if (UpdateProgress != null)
+            {
                 UpdateProgress(this, new UpdateProgressEventArgs(UpdateProgressStatus.STARTED));
+            }
+
             GetGitHubUpdates();
             if (UpdateProgress != null)
             {
                 if (currentRelease != null && remoteUpdates != null)
+                {
                     UpdateProgress(this, new UpdateProgressEventArgs(UpdateProgressStatus.COMPLETED));
+                }
                 else
+                {
                     UpdateProgress(this, new UpdateProgressEventArgs(UpdateProgressStatus.ERROR));
+                }
             }
+
             return remoteUpdates != null;
         }
 
@@ -233,7 +243,10 @@ namespace HomeGenie.Service
                 release = (ReleaseInfo)serializer.Deserialize(reader);
                 reader.Close();
             }
-            catch { }
+            catch
+            {
+            }
+
             return release;
         }
 
@@ -250,7 +263,8 @@ namespace HomeGenie.Service
         public List<ReleaseInfo> GetGitHubUpdates()
         {
             GetCurrentRelease();
-            //githubReleases
+
+            // githubReleases
             using (var client = new WebClient())
             {
                 client.Headers.Add("user-agent", "HomeGenieUpdater/1.0 (compatible; MSIE 7.0; Windows NT 6.0)");
@@ -264,12 +278,17 @@ namespace HomeGenie.Service
                     };
                     dynamic releases = JsonConvert.DeserializeObject(releaseJson, deserializerSettings) as JArray;
                     if (remoteUpdates != null)
-                        remoteUpdates.Clear();
-                    else
-                        remoteUpdates = new List<ReleaseInfo>();
-                    foreach(var rel in releases)
                     {
-                        foreach(dynamic relFile in (rel.assets as JArray))
+                        remoteUpdates.Clear();
+                    }
+                    else
+                    {
+                        remoteUpdates = new List<ReleaseInfo>();
+                    }
+
+                    foreach (var rel in releases)
+                    {
+                        foreach (dynamic relFile in rel.assets as JArray)
                         {
                             if (relFile.browser_download_url.ToString().EndsWith(".tgz"))
                             {
@@ -289,7 +308,7 @@ namespace HomeGenie.Service
                                 }
                                 else if (currentRelease.ReleaseDate < releaseDate)
                                 {
-                                    string relInfo = String.Format("\r\n\r\n[{0} {1:yyyy-MM-dd}]\r\n{2}", rel.tag_name.ToString(), releaseDate, rel.body.ToString());
+                                    string relInfo = string.Format("\r\n\r\n[{0} {1:yyyy-MM-dd}]\r\n{2}", rel.tag_name.ToString(), releaseDate, rel.body.ToString());
                                     remoteUpdates[0].ReleaseNote += relInfo;
                                 }
                                 else
@@ -298,9 +317,12 @@ namespace HomeGenie.Service
                                 }
                             }
                         }
+
                         // updates from github contains the whole HG bundle so we always consider the most recent one
                         if (collectingComplete)
+                        {
                             break;
+                        }
                     }
                 }
                 catch (Exception e)
@@ -313,6 +335,7 @@ namespace HomeGenie.Service
                     client.Dispose();
                 }
             }
+
             return remoteUpdates;
         }
 
@@ -340,7 +363,9 @@ namespace HomeGenie.Service
                             {
                                 remoteUpdates.Add(releaseInfo);
                                 if (releaseInfo.UpdateBreak)
+                                {
                                     break;
+                                }
                             }
                         }
                     }
@@ -353,6 +378,7 @@ namespace HomeGenie.Service
                     client.Dispose();
                 }
             }
+
             return remoteUpdates;
         }
 
@@ -372,6 +398,7 @@ namespace HomeGenie.Service
                         }
                     }
                 }
+
                 return update;
             }
         }
@@ -384,10 +411,11 @@ namespace HomeGenie.Service
         public bool DownloadUpdateFiles()
         {
             bool success = true;
-            //
             if (Directory.Exists(updateFolder))
+            {
                 Directory.Delete(updateFolder, true);
-            //
+            }
+
             if (remoteUpdates != null)
             {
                 foreach (var releaseInfo in remoteUpdates)
@@ -395,27 +423,31 @@ namespace HomeGenie.Service
                     if (currentRelease != null && currentRelease.ReleaseDate < releaseInfo.ReleaseDate)
                     {
                         var files = DownloadAndUncompress(releaseInfo);
-                        if (files == null) // || files.Count == 0)
+                        if (files == null)
                         {
                             success = false;
                         }
                     }
                 }
             }
+
             return success;
         }
 
         public List<string> DownloadAndUncompress(ReleaseInfo releaseInfo)
         {
             if (ArchiveDownloadUpdate != null)
+            {
                 ArchiveDownloadUpdate(this, new ArchiveDownloadEventArgs(releaseInfo, ArchiveDownloadStatus.DOWNLOADING));
-            //
+            }
+
             string destinationFolder = Path.Combine(updateFolder, "files");
             string archiveName = Path.Combine(updateFolder, "archives", "hg_update_" + releaseInfo.Version.Replace(" ", "_").Replace(".", "_") + ".zip");
             if (!Directory.Exists(Path.GetDirectoryName(archiveName)))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(archiveName));
             }
+
             using (var client = new WebClient())
             {
                 client.Headers.Add("user-agent", "HomeGenieUpdater/1.0 (compatible; MSIE 7.0; Windows NT 6.0)");
@@ -426,9 +458,13 @@ namespace HomeGenie.Service
                 catch (Exception)
                 {
                     if (ArchiveDownloadUpdate != null)
+                    {
                         ArchiveDownloadUpdate(this, new ArchiveDownloadEventArgs(releaseInfo, ArchiveDownloadStatus.ERROR));
+                    }
+
                     return null;
-                    //                throw;
+
+                    // throw;
                 }
                 finally
                 {
@@ -438,18 +474,24 @@ namespace HomeGenie.Service
 
             // Unarchive (unzip)
             if (ArchiveDownloadUpdate != null)
+            {
                 ArchiveDownloadUpdate(this, new ArchiveDownloadEventArgs(releaseInfo, ArchiveDownloadStatus.DECOMPRESSING));
+            }
 
             bool errorOccurred = false;
             var files = Utility.UncompressTgz(archiveName, destinationFolder);
-            errorOccurred = (files.Count == 0);
+            errorOccurred = files.Count == 0;
 
             if (ArchiveDownloadUpdate != null)
             {
                 if (errorOccurred)
+                {
                     ArchiveDownloadUpdate(this, new ArchiveDownloadEventArgs(releaseInfo, ArchiveDownloadStatus.ERROR));
+                }
                 else
+                {
                     ArchiveDownloadUpdate(this, new ArchiveDownloadEventArgs(releaseInfo, ArchiveDownloadStatus.COMPLETED));
+                }
             }
 
             // update release_info.xml file with last releaseInfo ReleaseDate field in order to reflect github release date
@@ -457,11 +499,11 @@ namespace HomeGenie.Service
             {
                 var ri = GetReleaseFile(Path.Combine(destinationFolder, "homegenie", releaseFile));
                 ri.ReleaseDate = releaseInfo.ReleaseDate.ToUniversalTime();
-                XmlSerializer serializer = new XmlSerializer(typeof(ReleaseInfo)); 
+                XmlSerializer serializer = new XmlSerializer(typeof(ReleaseInfo));
                 using (TextWriter writer = new StreamWriter(Path.Combine(destinationFolder, "homegenie", releaseFile)))
                 {
-                    serializer.Serialize(writer, ri); 
-                } 
+                    serializer.Serialize(writer, ri);
+                }
             }
 
             return files;
@@ -485,6 +527,7 @@ namespace HomeGenie.Service
             {
                 Directory.Move(fullReleaseFolder, newFilesPath);
             }
+
             Utility.FolderCleanUp(oldFilesPath);
             if (Directory.Exists(newFilesPath))
             {
@@ -493,7 +536,7 @@ namespace HomeGenie.Service
                 {
                     bool doNotCopy = false;
 
-                    string destinationFolder = Path.GetDirectoryName(file).Replace(newFilesPath, "").TrimStart('/').TrimStart('\\');
+                    string destinationFolder = Path.GetDirectoryName(file).Replace(newFilesPath, string.Empty).TrimStart('/').TrimStart('\\');
                     string destinationFile = Path.Combine(destinationFolder, Path.GetFileName(file)).TrimStart(Directory.GetDirectoryRoot(Directory.GetCurrentDirectory()).ToArray()).TrimStart('/').TrimStart('\\');
 
                     // Update file only if different from local one
@@ -502,7 +545,7 @@ namespace HomeGenie.Service
                     {
                         using (var md5 = MD5.Create())
                         {
-                            string localHash, remoteHash = "";
+                            string localHash, remoteHash = string.Empty;
                             try
                             {
                                 // Try getting files' hash
@@ -510,19 +553,22 @@ namespace HomeGenie.Service
                                 {
                                     localHash = BitConverter.ToString(md5.ComputeHash(stream));
                                 }
+
                                 using (var stream = File.OpenRead(file))
                                 {
                                     remoteHash = BitConverter.ToString(md5.ComputeHash(stream));
                                 }
+
                                 if (localHash != remoteHash)
                                 {
                                     processFile = true;
-                                    //Console.WriteLine("CHANGED {0}", destinationFile);
-                                    //Console.WriteLine("   - LOCAL  {0}", localHash);
-                                    //Console.WriteLine("   - REMOTE {0}", remoteHash);
+
+                                    // Console.WriteLine("CHANGED {0}", destinationFile);
+                                    // Console.WriteLine("   - LOCAL  {0}", localHash);
+                                    // Console.WriteLine("   - REMOTE {0}", remoteHash);
                                 }
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                                 // this mostly happen if the destinationFile is un use and cannot be opened,
                                 // file is then ignored if hash cannot be calculated
@@ -532,12 +578,12 @@ namespace HomeGenie.Service
                     else
                     {
                         processFile = true;
-                        //Console.WriteLine("NEW FILE {0}", file);
+
+                        // Console.WriteLine("NEW FILE {0}", file);
                     }
 
                     if (processFile)
                     {
-
                         // Some files needs to be handled differently than just copying
                         if (destinationFile.EndsWith(".xml") && File.Exists(destinationFile))
                         {
@@ -545,7 +591,7 @@ namespace HomeGenie.Service
                             {
                             case "automationgroups.xml":
                                 doNotCopy = true;
-                                status = UpdateAutomationGroups(file) ? InstallStatus.Success : InstallStatus.Error;;
+                                status = UpdateAutomationGroups(file) ? InstallStatus.Success : InstallStatus.Error;
                                 break;
                             case "groups.xml":
                                 doNotCopy = true;
@@ -559,17 +605,18 @@ namespace HomeGenie.Service
                                 break;
                             case "programs.xml":
                                 doNotCopy = true;
-                                status = UpdatePrograms(file) ? InstallStatus.Success : InstallStatus.Error;;
+                                status = UpdatePrograms(file) ? InstallStatus.Success : InstallStatus.Error;
                                 break;
                             case "scheduler.xml":
                                 doNotCopy = true;
-                                status = UpdateScheduler(file) ? InstallStatus.Success : InstallStatus.Error;;
+                                status = UpdateScheduler(file) ? InstallStatus.Success : InstallStatus.Error;
                                 break;
                             case "systemconfig.xml":
                                 doNotCopy = true;
-                                status = UpdateSystemConfig(file) ? InstallStatus.Success : InstallStatus.Error;;
+                                status = UpdateSystemConfig(file) ? InstallStatus.Success : InstallStatus.Error;
                                 break;
                             }
+
                             if (status == InstallStatus.Error)
                             {
                                 break;
@@ -584,9 +631,11 @@ namespace HomeGenie.Service
                         if (!doNotCopy)
                         {
                             if (destinationFile.EndsWith(".exe") || destinationFile.EndsWith(".dll") || destinationFile.EndsWith(".so"))
+                            {
                                 restartRequired = true;
+                            }
 
-                            if (!String.IsNullOrWhiteSpace(destinationFolder) && !Directory.Exists(destinationFolder))
+                            if (!string.IsNullOrWhiteSpace(destinationFolder) && !Directory.Exists(destinationFolder))
                             {
                                 Directory.CreateDirectory(destinationFolder);
                             }
@@ -599,8 +648,8 @@ namespace HomeGenie.Service
 
                                 LogMessage("+ Backup file '" + oldFile + "'");
 
-                                // TODO: delete oldFilesPath before starting update
-                                //File.Delete(oldFile); 
+                                //// TODO: delete oldFilesPath before starting update
+                                //// File.Delete(oldFile);
 
                                 if (destinationFile.EndsWith(".exe") || destinationFile.EndsWith(".dll"))
                                 {
@@ -616,7 +665,7 @@ namespace HomeGenie.Service
                             try
                             {
                                 LogMessage("+ Copying file '" + destinationFile + "'");
-                                if (!String.IsNullOrWhiteSpace(Path.GetDirectoryName(destinationFile)) && !Directory.Exists(Path.GetDirectoryName(destinationFile)))
+                                if (!string.IsNullOrWhiteSpace(Path.GetDirectoryName(destinationFile)) && !Directory.Exists(Path.GetDirectoryName(destinationFile)))
                                 {
                                     try
                                     {
@@ -627,6 +676,7 @@ namespace HomeGenie.Service
                                     {
                                     }
                                 }
+
                                 File.Copy(file, destinationFile, true);
                             }
                             catch (Exception e)
@@ -637,7 +687,6 @@ namespace HomeGenie.Service
                             }
                         }
                     }
-
                 }
 
                 if (status == InstallStatus.Error)
@@ -649,7 +698,6 @@ namespace HomeGenie.Service
                 {
                     status = InstallStatus.RestartRequired;
                 }
-
             }
 
             return status;
@@ -672,6 +720,7 @@ namespace HomeGenie.Service
                         }
                     }
                 }
+
                 return restartRequired;
             }
         }
@@ -679,16 +728,14 @@ namespace HomeGenie.Service
         public bool UpdateGroups(string file)
         {
             bool success = true;
-            //
-            // add new modules groups 
-            //
+
+            // add new modules groups
             try
             {
                 var serializer = new XmlSerializer(typeof(List<Group>));
                 var reader = new StreamReader(file);
                 var modulesGroups = (List<Group>)serializer.Deserialize(reader);
                 reader.Close();
-                //
                 bool configChanged = false;
                 foreach (var group in modulesGroups)
                 {
@@ -697,39 +744,41 @@ namespace HomeGenie.Service
                         LogMessage("+ Adding Modules Group: " + group.Name);
                         homegenie.Groups.Add(group);
                         if (!configChanged)
+                        {
                             configChanged = true;
+                        }
                     }
                 }
-                //
+
                 if (configChanged)
                 {
-                    homegenie.UpdateGroupsDatabase("");
+                    homegenie.UpdateGroupsDatabase(string.Empty);
                 }
             }
             catch
             {
                 success = false;
             }
+
             if (!success)
             {
                 LogMessage("! ERROR updating Modules Groups");
             }
+
             return success;
         }
 
         public bool UpdateAutomationGroups(string file)
         {
             bool success = true;
-            //
-            // add new automation groups 
-            //
+
+            // add new automation groups
             try
             {
                 var serializer = new XmlSerializer(typeof(List<Group>));
                 var reader = new StreamReader(file);
                 var automationGroups = (List<Group>)serializer.Deserialize(reader);
                 reader.Close();
-                //
                 bool configChanged = false;
                 foreach (var group in automationGroups)
                 {
@@ -738,10 +787,12 @@ namespace HomeGenie.Service
                         LogMessage("+ Adding Automation Group: " + group.Name);
                         homegenie.AutomationGroups.Add(group);
                         if (!configChanged)
+                        {
                             configChanged = true;
+                        }
                     }
                 }
-                //
+
                 if (configChanged)
                 {
                     homegenie.UpdateGroupsDatabase("Automation");
@@ -751,26 +802,26 @@ namespace HomeGenie.Service
             {
                 success = false;
             }
+
             if (!success)
             {
                 LogMessage("! ERROR updating Automation Groups");
             }
+
             return success;
         }
 
         public bool UpdateScheduler(string file)
         {
             bool success = true;
-            //
+
             // add new scheduler items
-            //
             try
             {
                 var serializer = new XmlSerializer(typeof(List<SchedulerItem>));
                 var reader = new StreamReader(file);
                 var schedulerItems = (List<SchedulerItem>)serializer.Deserialize(reader);
                 reader.Close();
-                //
                 bool configChanged = false;
                 foreach (var item in schedulerItems)
                 {
@@ -780,10 +831,12 @@ namespace HomeGenie.Service
                         LogMessage("+ Adding Scheduler Item: " + item.Name);
                         homegenie.ProgramManager.SchedulerService.AddOrUpdate(item.Name, item.CronExpression, item.Data, item.Description, item.Script);
                         if (!configChanged)
+                        {
                             configChanged = true;
+                        }
                     }
                 }
-                //
+
                 if (configChanged)
                 {
                     homegenie.UpdateSchedulerDatabase();
@@ -793,25 +846,25 @@ namespace HomeGenie.Service
             {
                 success = false;
             }
+
             if (!success)
             {
                 LogMessage("! ERROR updating Scheduler Items");
             }
+
             return success;
         }
 
         public bool UpdateSystemConfig(string file)
         {
             bool success = true;
-            //
+
             // add new MIG interfaces
-            //
             try
             {
                 var serializer = new XmlSerializer(typeof(SystemConfiguration));
                 var reader = new StreamReader(file);
                 var config = (SystemConfiguration)serializer.Deserialize(reader);
-                //
                 bool configChanged = false;
                 foreach (var iface in config.MigService.Interfaces)
                 {
@@ -820,10 +873,12 @@ namespace HomeGenie.Service
                         LogMessage("+ Adding MIG Interface: " + iface.Domain);
                         homegenie.SystemConfiguration.MigService.Interfaces.Add(iface);
                         if (!configChanged)
+                        {
                             configChanged = true;
+                        }
                     }
                 }
-                //
+
                 if (configChanged)
                 {
                     homegenie.SystemConfiguration.Update();
@@ -833,10 +888,12 @@ namespace HomeGenie.Service
             {
                 success = false;
             }
+
             if (!success)
             {
                 LogMessage("! ERROR updating System Configuration");
             }
+
             return success;
         }
 
@@ -849,30 +906,28 @@ namespace HomeGenie.Service
                 var reader = new StreamReader(file);
                 var newProgramList = (List<ProgramBlock>)serializer.Deserialize(reader);
                 reader.Close();
-                //
                 if (newProgramList.Count > 0)
                 {
                     bool configChanged = false;
                     foreach (var program in newProgramList)
                     {
-
                         // Only system programs are to be updated
                         if (program.Address < ProgramManager.USERSPACE_PROGRAMS_START)
                         {
                             ProgramBlock oldProgram = homegenie.ProgramManager.Programs.Find(p => p.Address == program.Address);
                             if (oldProgram != null)
                             {
-
                                 // Check new program against old one to find out if they differ
                                 bool changed = ProgramsDiff(oldProgram, program);
                                 if (!changed)
+                                {
                                     continue;
+                                }
 
                                 // Preserve IsEnabled status if program already exist
                                 program.IsEnabled = oldProgram.IsEnabled;
                                 LogMessage("* Updating Automation Program: " + program.Name + " (" + program.Address + ")");
                                 homegenie.ProgramManager.ProgramRemove(oldProgram);
-
                             }
                             else
                             {
@@ -908,9 +963,10 @@ namespace HomeGenie.Service
                             homegenie.ProgramManager.ProgramAdd(program);
 
                             if (!configChanged)
+                            {
                                 configChanged = true;
+                            }
                         }
-
                     }
 
                     if (configChanged)
@@ -919,7 +975,7 @@ namespace HomeGenie.Service
                         homegenie.UpdateProgramsDatabase();
                     }
                 }
-                //
+
                 File.Delete(file);
                 if (Directory.Exists(Path.Combine(homegenie.UpdateChecker.UpdateBaseFolder, "programs")))
                 {
@@ -935,20 +991,21 @@ namespace HomeGenie.Service
             {
                 LogMessage("+ ERROR updating Automation Programs");
             }
+
             return success;
         }
 
         private bool ProgramsDiff(ProgramBlock oldProgram, ProgramBlock newProgram)
         {
-            bool unchanged = (JsonConvert.SerializeObject(oldProgram.ConditionType) == JsonConvert.SerializeObject(newProgram.ConditionType)) &&
-                             (JsonConvert.SerializeObject(oldProgram.Conditions) == JsonConvert.SerializeObject(newProgram.Conditions)) &&
-                             (JsonConvert.SerializeObject(oldProgram.Commands) == JsonConvert.SerializeObject(newProgram.Commands)) &&
-                             (oldProgram.ScriptCondition == newProgram.ScriptCondition) &&
-                             (oldProgram.ScriptSource == newProgram.ScriptSource) &&
-                             (oldProgram.Name == newProgram.Name) &&
-                             (oldProgram.Description == newProgram.Description) &&
-                             (oldProgram.Group == newProgram.Group) &&
-                             (oldProgram.Type == newProgram.Type);
+            bool unchanged = JsonConvert.SerializeObject(oldProgram.ConditionType) == JsonConvert.SerializeObject(newProgram.ConditionType) &&
+                             JsonConvert.SerializeObject(oldProgram.Conditions) == JsonConvert.SerializeObject(newProgram.Conditions) &&
+                             JsonConvert.SerializeObject(oldProgram.Commands) == JsonConvert.SerializeObject(newProgram.Commands) &&
+                             oldProgram.ScriptCondition == newProgram.ScriptCondition &&
+                             oldProgram.ScriptSource == newProgram.ScriptSource &&
+                             oldProgram.Name == newProgram.Name &&
+                             oldProgram.Description == newProgram.Description &&
+                             oldProgram.Group == newProgram.Group &&
+                             oldProgram.Type == newProgram.Type;
             return !unchanged;
         }
 
@@ -968,6 +1025,5 @@ namespace HomeGenie.Service
                 // TODO: ...
             }
         }
-
     }
 }

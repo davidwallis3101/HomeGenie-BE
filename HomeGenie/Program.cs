@@ -1,32 +1,30 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using HomeGenie.Service;
-using HomeGenie.Service.Constants;
-using MIG;
+﻿// <copyright file="Program.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie
 {
+    using System;
+    using HomeGenie.Service;
+    using HomeGenie.Service.Constants;
+    using MIG;
+
     class Program
     {
         private static HomeGenieService _homegenie = null;
@@ -41,7 +39,11 @@ namespace HomeGenie
             Console.CancelKeyPress += new ConsoleCancelEventHandler(Console_CancelKeyPress);
 
             _homegenie = new HomeGenieService();
-            do { System.Threading.Thread.Sleep(2000); } while (_isrunning);
+            do
+            {
+                System.Threading.Thread.Sleep(2000);
+            }
+            while (_isrunning);
         }
 
         internal static void Quit(bool restartService)
@@ -54,13 +56,12 @@ namespace HomeGenie
         private static void ShutDown()
         {
             Console.Write("HomeGenie is now exiting...\n");
-            //
             if (_homegenie != null)
             {
                 _homegenie.Stop();
                 _homegenie = null;
             }
-            //
+
             int exitCode = 0;
             if (_restart)
             {
@@ -71,7 +72,7 @@ namespace HomeGenie
             {
                 Console.Write("\n\n...QUIT!\n\n");
             }
-            //
+
             Environment.Exit(exitCode);
         }
 
@@ -81,28 +82,23 @@ namespace HomeGenie
             Quit(false);
         }
 
-        private static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e) 
+        private static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
         {
             var logEntry = new MigEvent(
                 Domains.HomeAutomation_HomeGenie,
                 "Trapper",
                 "Unhandled Exception",
                 "Error.Exception",
-                e.ExceptionObject.ToString()
-            );
+                e.ExceptionObject.ToString());
             try
             {
                 // try broadcast first (we don't want homegenie object to be passed, so use the domain string)
                 _homegenie.RaiseEvent(Domains.HomeGenie_System, logEntry);
             }
-            catch 
+            catch
             {
                 HomeGenieService.LogError(logEntry);
             }
         }
-
     }
-
 }
-
-

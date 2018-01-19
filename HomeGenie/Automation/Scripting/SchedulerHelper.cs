@@ -1,36 +1,30 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using HomeGenie.Automation.Scheduler;
-using HomeGenie.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Innovative.SolarCalculator;
+﻿// <copyright file="SchedulerHelper.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scripting
 {
-    
+    using System;
+    using HomeGenie.Automation.Scheduler;
+    using HomeGenie.Service;
+    using Innovative.SolarCalculator;
+
     /// <summary>
     /// Scheduler helper.\n
     /// Class instance accessor: **Scheduler**
@@ -38,7 +32,6 @@ namespace HomeGenie.Automation.Scripting
     [Serializable]
     public class SchedulerHelper
     {
-
         private HomeGenieService homegenie;
         private string scheduleName;
 
@@ -79,7 +72,7 @@ namespace HomeGenie.Automation.Scripting
         /// Sets the program id to run when the selected schedule occurs.
         /// </summary>
         /// <param name="programId">Program ID.</param>
-        [Obsolete()]
+        [Obsolete]
         public SchedulerHelper SetProgram(string programId)
         {
             homegenie.ProgramManager.SchedulerService.SetProgram(scheduleName, programId);
@@ -97,6 +90,7 @@ namespace HomeGenie.Automation.Scripting
             {
                 return homegenie.ProgramManager.SchedulerService.IsScheduling(DateTime.Now, eventItem.CronExpression);
             }
+
             return false;
         }
 

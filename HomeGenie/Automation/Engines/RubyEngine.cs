@@ -1,40 +1,39 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using Microsoft.Scripting.Hosting;
-using HomeGenie.Automation.Scripting;
-using IronRuby;
-using System.Collections.Generic;
+﻿// <copyright file="RubyEngine.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Engines
 {
+    using System;
+    using System.Collections.Generic;
+    using HomeGenie.Automation.Scripting;
+    using IronRuby;
+    using Microsoft.Scripting.Hosting;
+
     public class RubyEngine : ProgramEngineBase, IProgramEngine
     {
         internal ScriptEngine scriptEngine;
         private ScriptScope scriptScope;
         private ScriptingHost hgScriptingHost;
 
-        public RubyEngine(ProgramBlock pb) : base(pb)
+        public RubyEngine(ProgramBlock pb)
+            : base(pb)
         {
         }
 
@@ -46,6 +45,7 @@ namespace HomeGenie.Automation.Engines
                 scriptEngine.Runtime.Shutdown();
                 scriptEngine = null;
             }
+
             hgScriptingHost = null;
             scriptScope = null;
         }
@@ -55,7 +55,9 @@ namespace HomeGenie.Automation.Engines
             Unload();
 
             if (Homegenie == null)
+            {
                 return false;
+            }
 
             scriptEngine = Ruby.CreateEngine();
 
@@ -70,12 +72,15 @@ namespace HomeGenie.Automation.Engines
         public void Reset()
         {
             if (hgScriptingHost != null)
+            {
                 hgScriptingHost.Reset();
+            }
         }
 
         public ProgramError GetFormattedError(Exception e, bool isTriggerBlock)
         {
-            ProgramError error = new ProgramError() {
+            ProgramError error = new ProgramError()
+            {
                 CodeBlock = isTriggerBlock ? CodeBlockEnum.TC : CodeBlockEnum.CR,
                 Column = 0,
                 Line = 0,
@@ -89,6 +94,7 @@ namespace HomeGenie.Automation.Engines
                 int.TryParse(message[1].Substring(5), out line);
                 error.Line = line;
             }
+
             return error;
         }
 
@@ -107,6 +113,7 @@ namespace HomeGenie.Automation.Engines
             {
                 result.Exception = e;
             }
+
             return result;
         }
 
@@ -123,6 +130,7 @@ namespace HomeGenie.Automation.Engines
             {
                 result.Exception = e;
             }
+
             return result;
         }
 
@@ -146,4 +154,3 @@ namespace HomeGenie.Automation.Engines
         }
     }
 }
-

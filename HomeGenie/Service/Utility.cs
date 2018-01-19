@@ -1,51 +1,44 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
-using System.Dynamic;
-using System.IO;
-using System.Net;
-using System.Diagnostics;
-using System.Threading;
-using System.Runtime.InteropServices;
-
-using Newtonsoft.Json;
-
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Core;
-
-using HomeGenie.Data;
-using HomeGenie.Service.Constants;
-using Newtonsoft.Json.Serialization;
-using ICSharpCode.SharpZipLib.GZip;
-using ICSharpCode.SharpZipLib.Tar;
+﻿// <copyright file="Utility.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Service
 {
-    
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Dynamic;
+    using System.IO;
+    using System.Net;
+    using System.Runtime.InteropServices;
+    using System.Text;
+    using System.Threading;
+    using System.Xml.Linq;
+    using HomeGenie.Data;
+    using HomeGenie.Service.Constants;
+    using ICSharpCode.SharpZipLib.Core;
+    using ICSharpCode.SharpZipLib.GZip;
+    using ICSharpCode.SharpZipLib.Tar;
+    using ICSharpCode.SharpZipLib.Zip;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Serialization;
+
     public static class SerializationExtensions
     {
         /// <summary>
@@ -57,10 +50,13 @@ namespace HomeGenie.Service
         public static T DeepClone<T>(this T source)
         {
             // Don't serialize a null object, simply return the default for that object
+#pragma warning disable SA1121 // Use built-in type alias
             if (Object.ReferenceEquals(source, null))
+#pragma warning restore SA1121 // Use built-in type alias
             {
                 return default(T);
             }
+
             return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(source));
         }
     }
@@ -74,11 +70,12 @@ namespace HomeGenie.Service
             {
                 diff += 7;
             }
+
             return dt.AddDays(-1 * diff).Date;
         }
     }
 
-    [Serializable()]
+    [Serializable]
     public class TsList<T> : System.Collections.Generic.List<T>
     {
         private object syncLock = new object();
@@ -88,40 +85,49 @@ namespace HomeGenie.Service
             get { return syncLock; }
         }
 
-        new public void Clear()
+        public new void Clear()
         {
             lock (syncLock)
+            {
                 base.Clear();
+            }
         }
 
-        new public void Add(T value)
+        public new void Add(T value)
         {
             lock (syncLock)
+            {
                 base.Add(value);
+            }
         }
 
-        new public void RemoveAll(Predicate<T> predicate)
+        public new void RemoveAll(Predicate<T> predicate)
         {
             lock (syncLock)
+            {
                 base.RemoveAll(predicate);
+            }
         }
 
-        new public void Remove(T item)
+        public new void Remove(T item)
         {
             lock (syncLock)
+            {
                 base.Remove(item);
+            }
         }
 
-        new public void Sort(Comparison<T> comparison)
+        public new void Sort(Comparison<T> comparison)
         {
             lock (syncLock)
+            {
                 base.Sort(comparison);
+            }
         }
     }
 
     public static class Utility
     {
-
         public static dynamic ParseXmlToDynamic(string xml)
         {
             var document = XElement.Load(new StringReader(xml));
@@ -132,7 +138,10 @@ namespace HomeGenie.Service
         public static ModuleParameter ModuleParameterGet(Module module, string propertyName)
         {
             if (module == null)
+            {
                 return null;
+            }
+
             return ModuleParameterGet(module.Properties, propertyName);
         }
 
@@ -144,7 +153,10 @@ namespace HomeGenie.Service
         public static ModuleParameter ModuleParameterSet(Module module, string propertyName, string propertyValue)
         {
             if (module == null)
+            {
                 return null;
+            }
+
             return ModuleParameterSet(module.Properties, propertyName, propertyValue);
         }
 
@@ -156,6 +168,7 @@ namespace HomeGenie.Service
                 parameter = new ModuleParameter() { Name = propertyName, Value = propertyValue };
                 parameters.Add(parameter);
             }
+
             parameter.Value = propertyValue;
             return parameter;
         }
@@ -170,12 +183,13 @@ namespace HomeGenie.Service
 
         public static string Module2Json(Module module, bool hideProperties)
         {
-            var settings = new JsonSerializerSettings{ Formatting = Formatting.Indented };
+            var settings = new JsonSerializerSettings { Formatting = Formatting.Indented };
             if (hideProperties)
             {
-                var resolver = new IgnorePropertyContractResolver(new List<string>{ "Properties" });
+                var resolver = new IgnorePropertyContractResolver(new List<string> { "Properties" });
                 settings.ContractResolver = resolver;
             }
+
             return JsonConvert.SerializeObject(module, settings);
         }
 
@@ -183,7 +197,7 @@ namespace HomeGenie.Service
         {
             if (fieldValue == null)
             {
-                fieldValue = "";
+                fieldValue = string.Empty;
             }
             else
             {
@@ -195,6 +209,7 @@ namespace HomeGenie.Service
                 fieldValue = fieldValue.Replace("\b", "\\b");
                 fieldValue = fieldValue.Replace("\f", "\\f");
             }
+
             return fieldValue;
         }
 
@@ -202,13 +217,14 @@ namespace HomeGenie.Service
         {
             if (fieldValue == null)
             {
-                fieldValue = "";
+                fieldValue = string.Empty;
             }
-            else //if (s.IndexOf("&") >= 0 && s.IndexOf("\"") >= 0)
+            else
             {
                 fieldValue = fieldValue.Replace("&", "&amp;");
                 fieldValue = fieldValue.Replace("\"", "&quot;");
             }
+
             return fieldValue;
         }
 
@@ -219,6 +235,7 @@ namespace HomeGenie.Service
             {
                 Directory.CreateDirectory(tempFolder);
             }
+
             return tempFolder;
         }
 
@@ -231,6 +248,7 @@ namespace HomeGenie.Service
                 {
                     Directory.Delete(path, true);
                 }
+
                 Directory.CreateDirectory(path);
             }
             catch
@@ -238,17 +256,19 @@ namespace HomeGenie.Service
                 // TODO: report exception
             }
         }
-        
+
         private static string picoPath = "/usr/bin/pico2wave";
+
         public static void Say(string sentence, string locale, bool async = false)
         {
             // if Pico TTS is not installed, then use Google Voice API
             // Note: Pico is only supported in Linux
-            if (File.Exists(picoPath) && "#en-us#en-gb#de-de#es-es#fr-fr#it-it#".IndexOf("#"+locale.ToLower()+"#") >= 0)
+            if (File.Exists(picoPath) && "#en-us#en-gb#de-de#es-es#fr-fr#it-it#".IndexOf("#" + locale.ToLower() + "#") >= 0)
             {
                 if (async)
                 {
-                    var t = new Thread(() => {
+                    var t = new Thread(() =>
+                    {
                         PicoSay(sentence, locale);
                     });
                     t.Start();
@@ -262,7 +282,8 @@ namespace HomeGenie.Service
             {
                 if (async)
                 {
-                    var t = new Thread(() => {
+                    var t = new Thread(() =>
+                    {
                         GoogleVoiceSay(sentence, locale);
                     });
                     t.Start();
@@ -273,13 +294,11 @@ namespace HomeGenie.Service
                 }
             }
         }
-        
+
         public static void Play(string wavFile)
         {
-
             var os = Environment.OSVersion;
             var platform = os.Platform;
-            //
             switch (platform)
             {
                 case PlatformID.Win32NT:
@@ -291,10 +310,11 @@ namespace HomeGenie.Service
                 case PlatformID.Unix:
                 case PlatformID.MacOSX:
                 default:
-                //var player = new System.Media.SoundPlayer();
-                //player.SoundLocation = wavFile;
-                //player.Play();
-                Process.Start(new ProcessStartInfo("aplay", "\"" + wavFile + "\"") {
+                // var player = new System.Media.SoundPlayer();
+                // player.SoundLocation = wavFile;
+                // player.Play();
+                Process.Start(new ProcessStartInfo("aplay", "\"" + wavFile + "\"")
+                {
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
@@ -302,15 +322,14 @@ namespace HomeGenie.Service
                 }).WaitForExit();
                 break;
             }
-
         }
-
-        #region Private helper methods
 
         [DllImport("winmm.dll", SetLastError = true)]
         static extern bool PlaySound(string pszSound, UIntPtr hmod, uint fdwSound);
+
         // buffer size for AddFileToZip
         private const long BUFFER_SIZE = 4096;
+
         // delegate used by RunAsyncTask
         public delegate void AsyncFunction();
 
@@ -320,9 +339,12 @@ namespace HomeGenie.Service
             {
                 var wavFile = Path.Combine(GetTmpFolder(), "_synthesis_tmp.wav");
                 if (File.Exists(wavFile))
+                {
                     File.Delete(wavFile);
+                }
 
-                Process.Start(new ProcessStartInfo(picoPath, " -w " + wavFile + " -l " + locale + " \"" + sentence + "\"") {
+                Process.Start(new ProcessStartInfo(picoPath, " -w " + wavFile + " -l " + locale + " \"" + sentence + "\"")
+                {
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
@@ -330,7 +352,9 @@ namespace HomeGenie.Service
                 }).WaitForExit();
 
                 if (File.Exists(wavFile))
+                {
                     Play(wavFile);
+                }
             }
             catch (Exception e)
             {
@@ -350,8 +374,10 @@ namespace HomeGenie.Service
                     var audioData = client.DownloadData("http://translate.google.com/translate_tts?ie=UTF-8&tl=" + Uri.EscapeDataString(locale) + "&q=" + Uri.EscapeDataString(sentence) + "&client=homegenie&ts=" + DateTime.UtcNow.Ticks);
 
                     if (File.Exists(mp3File))
+                    {
                         File.Delete(mp3File);
-                    
+                    }
+
                     var stream = File.OpenWrite(mp3File);
                     stream.Write(audioData, 0, audioData.Length);
                     stream.Close();
@@ -360,7 +386,8 @@ namespace HomeGenie.Service
                 }
 
                 var wavFile = mp3File.Replace(".mp3", ".wav");
-                Process.Start(new ProcessStartInfo("lame", "--decode \"" + mp3File + "\" \"" + wavFile + "\"") {
+                Process.Start(new ProcessStartInfo("lame", "--decode \"" + mp3File + "\" \"" + wavFile + "\"")
+                {
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
@@ -368,7 +395,9 @@ namespace HomeGenie.Service
                 }).WaitForExit();
 
                 if (File.Exists(mp3File))
+                {
                     Play(wavFile);
+                }
             }
             catch (Exception e)
             {
@@ -385,7 +414,8 @@ namespace HomeGenie.Service
                 Stream gzipStream = new GZipInputStream(inStream);
 
                 TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
-                tarArchive.ProgressMessageEvent += (archive, entry, message) => {
+                tarArchive.ProgressMessageEvent += (archive, entry, message) =>
+                {
                     extractedFiles.Add(entry.Name);
                 };
 
@@ -395,8 +425,8 @@ namespace HomeGenie.Service
 
                 gzipStream.Close();
                 inStream.Close();
-            } 
-            catch (Exception e) 
+            }
+            catch (Exception e)
             {
                 Console.WriteLine("UnTar error: " + e.Message);
             }
@@ -413,9 +443,10 @@ namespace HomeGenie.Service
             {
                 FileStream fs = File.OpenRead(archiveName);
                 zipFile = new ZipFile(fs);
-                //if (!String.IsNullOrEmpty(password)) {
+
+                // if (!String.IsNullOrEmpty(password)) {
                 //    zf.Password = password;  // AES encrypted entries are handled automatically
-                //}
+                // }
                 foreach (ZipEntry zipEntry in zipFile)
                 {
                     if (!zipEntry.IsFile)
@@ -424,28 +455,38 @@ namespace HomeGenie.Service
                     }
 
                     string filePath = zipEntry.Name;
-                    string target = Path.Combine(destinationFolder, filePath.TrimStart(new char[]{'/', '\\'}));
+                    string target = Path.Combine(destinationFolder, filePath.TrimStart(new char[] { '/', '\\' }));
                     if (!Directory.Exists(Path.GetDirectoryName(target)))
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(target));
                     }
 
                     if (File.Exists(target))
+                    {
                         File.Delete(target);
-                    
+                    }
+
                     byte[] buffer = new byte[4096];
                     Stream zipStream = zipFile.GetInputStream(zipEntry);
-                    String fullZipToPath = Path.Combine(destinationFolder, filePath);
+                    string fullZipToPath = Path.Combine(destinationFolder, filePath);
                     using (FileStream streamWriter = File.Create(fullZipToPath))
                     {
                         StreamUtils.Copy(zipStream, streamWriter, buffer);
                     }
-                    try { extractedFiles.Add(filePath); } catch { }
+
+                    try
+                    {
+                        extractedFiles.Add(filePath);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
             catch (Exception e)
             {
                 extractedFiles.Clear();
+
                 // TODO: something to do here?
                 Console.WriteLine("Unzip error: " + e.Message);
             }
@@ -457,6 +498,7 @@ namespace HomeGenie.Service
                     zipFile.Close();
                 }
             }
+
             return extractedFiles;
         }
 
@@ -467,7 +509,7 @@ namespace HomeGenie.Service
             {
                 FileStream zfs = File.Create(zipFilename);
                 ZipOutputStream zipStream = new ZipOutputStream(zfs);
-                zipStream.SetLevel(3); //0-9, 9 being the highest level of compression
+                zipStream.SetLevel(3); // 0-9, 9 being the highest level of compression
                 /*
                 // NOTE: commented code because this is raising an error "Extra data extended Zip64 information length is invalid"
                 // For compatibility with previous HG, we add the "[Content_Types].xml" file
@@ -480,9 +522,10 @@ namespace HomeGenie.Service
                 zipStream.IsStreamOwner = true; // Makes the Close also close the underlying stream
                 zipStream.Close();
             }
+
             ZipFile zipFile = new ZipFile(zipFilename);
             zipFile.BeginUpdate();
-            zipFile.Add(fileToAdd, (String.IsNullOrWhiteSpace(storeAsName) ? fileToAdd : storeAsName));
+            zipFile.Add(fileToAdd, string.IsNullOrWhiteSpace(storeAsName) ? fileToAdd : storeAsName);
             zipFile.CommitUpdate();
             zipFile.IsStreamOwner = true;
             zipFile.Close();
@@ -521,32 +564,28 @@ namespace HomeGenie.Service
         public static DateTime JavascriptToDate(long timestamp)
         {
             var baseDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-            return (baseDate.AddMilliseconds(timestamp));
+            return baseDate.AddMilliseconds(timestamp);
         }
 
         public static DateTime JavascriptToDateUtc(double timestamp)
         {
             var baseDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Local);
-            return (baseDate.AddMilliseconds(timestamp).ToUniversalTime());
+            return baseDate.AddMilliseconds(timestamp).ToUniversalTime();
         }
 
         public static double DateToJavascript(DateTime date)
         {
-            return ((date.Ticks - 621355968000000000L) / 10000D);
+            return (date.Ticks - 621355968000000000L) / 10000D;
         }
 
         public static double DateToJavascriptLocal(DateTime date)
         {
-            return ((date.ToLocalTime().Ticks - 621355968000000000L) / 10000D);
+            return (date.ToLocalTime().Ticks - 621355968000000000L) / 10000D;
         }
-
-        #endregion
-
     }
 
     public class DynamicXmlParser : DynamicObject
     {
-
         XElement element;
 
         public DynamicXmlParser(string filename)
@@ -605,6 +644,7 @@ namespace HomeGenie.Service
                 {
                     return string.Empty;
                 }
+
                 return element.Attribute(attr).Value;
             }
         }
@@ -612,7 +652,7 @@ namespace HomeGenie.Service
 
     public class ConsoleRedirect : TextWriter
     {
-        private string lineBuffer = "";
+        private string lineBuffer = string.Empty;
 
         public Action<string> ProcessOutput;
 
@@ -623,35 +663,47 @@ namespace HomeGenie.Service
             {
                 string[] parts = message.Split(CoreNewLine);
                 if (message.StartsWith(newLine))
+                {
                     this.WriteLine(this.lineBuffer);
+                }
                 else
+                {
                     parts[0] = this.lineBuffer + parts[0];
-                this.lineBuffer = "";
+                }
+
+                this.lineBuffer = string.Empty;
                 if (parts.Length > 1 && !parts[parts.Length - 1].EndsWith(newLine))
                 {
                     this.lineBuffer += parts[parts.Length - 1];
-                    parts[parts.Length - 1] = "";
+                    parts[parts.Length - 1] = string.Empty;
                 }
+
                 foreach (var s in parts)
                 {
-                    if (!String.IsNullOrWhiteSpace(s))
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
                         this.WriteLine(s);
+                    }
                 }
-                message = "";
+
+                message = string.Empty;
             }
+
             this.lineBuffer += message;
         }
+
         public override void WriteLine(string message)
         {
             if (ProcessOutput != null && !string.IsNullOrWhiteSpace(message))
             {
                 // log entire line into the "Domain" column
-                //SystemLogger.Instance.WriteToLog(new HomeGenie.Data.LogEntry() {
+                // SystemLogger.Instance.WriteToLog(new HomeGenie.Data.LogEntry() {
                 //    Domain = "# " + this.lineBuffer + message
-                //});
+                // });
                 ProcessOutput(this.lineBuffer + message);
             }
-            this.lineBuffer = "";
+
+            this.lineBuffer = string.Empty;
         }
 
         public override System.Text.Encoding Encoding
@@ -661,7 +713,6 @@ namespace HomeGenie.Service
                 return UTF8Encoding.UTF8;
             }
         }
-
     }
 
     public class IgnorePropertyContractResolver : DefaultContractResolver
@@ -677,7 +728,10 @@ namespace HomeGenie.Service
         {
             var jsonProperty = base.CreateProperty(member, memberSerialization);
             if (_ignoredProperties.Contains(member.Name))
-                jsonProperty.ShouldSerialize = instance => {return false;};
+            {
+                jsonProperty.ShouldSerialize = instance => { return false; };
+            }
+
             return jsonProperty;
         }
     }

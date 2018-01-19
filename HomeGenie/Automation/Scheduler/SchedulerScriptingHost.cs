@@ -1,35 +1,31 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
-*     Author: Generoso Martello <gene@homegenie.it>
-*     Project Homepage: http://github.com/Bounz/HomeGenie-BE
-*/
-
-using System;
-using HomeGenie.Service;
-
-using HomeGenie.Automation.Scripting;
-using HomeGenie.Data;
-using System.Threading;
-using HomeGenie.Service.Constants;
+﻿// <copyright file="SchedulerScriptingHost.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scheduler
 {
+    using System;
+    using System.Threading;
+    using HomeGenie.Automation.Scripting;
+    using HomeGenie.Data;
+    using HomeGenie.Service;
+    using HomeGenie.Service.Constants;
 
     public class MethodRunResult
     {
@@ -40,11 +36,9 @@ namespace HomeGenie.Automation.Scheduler
     [Serializable]
     public class SchedulerScriptingHost
     {
-
         private HomeGenieService homegenie = null;
         private SchedulerItem schedulerItem = null;
         private Store localStore;
-        //
         private NetHelper netHelper;
         private SerialPortHelper serialPortHelper;
         private TcpClientHelper tcpClientHelper;
@@ -59,7 +53,7 @@ namespace HomeGenie.Automation.Scheduler
         public SchedulerScriptingHost()
         {
             localStore = new Store();
-            storeHelper = new StoreHelper(new TsList<Store>(){localStore}, "local");
+            storeHelper = new StoreHelper(new TsList<Store>() { localStore }, "local");
         }
 
         public void SetHost(HomeGenieService hg, SchedulerItem item)
@@ -103,7 +97,7 @@ namespace HomeGenie.Automation.Scheduler
                             Properties.SchedulerModuleUpdateEnd,
                             schedulerItem.Name);
                     }
-                    catch (Exception e) 
+                    catch (Exception e)
                     {
                         homegenie.MigService.RaiseEvent(
                             this,
@@ -145,12 +139,16 @@ namespace HomeGenie.Automation.Scheduler
             get
             {
                 var boundModulesManager = new ModulesManager(homegenie);
-                boundModulesManager.ModulesListCallback = new Func<ModulesManager,TsList<Module>>((sender)=>{
+                boundModulesManager.ModulesListCallback = new Func<ModulesManager, TsList<Module>>((sender) =>
+                {
                     TsList<Module> modules = new TsList<Module>();
-                    foreach(var m in schedulerItem.BoundModules) {
-                        var mod = homegenie.Modules.Find(e=>e.Address == m.Address && e.Domain == m.Domain);
+                    foreach (var m in schedulerItem.BoundModules)
+                    {
+                        var mod = homegenie.Modules.Find(e => e.Address == m.Address && e.Domain == m.Domain);
                         if (mod != null)
+                        {
                             modules.Add(mod);
+                        }
                     }
                     return modules;
                 });
@@ -239,15 +237,16 @@ namespace HomeGenie.Automation.Scheduler
 
         public void Say(string sentence, string locale = null, bool goAsync = false)
         {
-            if (String.IsNullOrWhiteSpace(locale))
+            if (string.IsNullOrWhiteSpace(locale))
             {
                 locale = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
             }
+
             try
             {
                 Utility.Say(sentence, locale, goAsync);
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 HomeGenieService.LogError(e);
             }
@@ -255,14 +254,53 @@ namespace HomeGenie.Automation.Scheduler
 
         public void Reset()
         {
-            try { serialPortHelper.Reset(); } catch { }
-            try { tcpClientHelper.Reset(); } catch { }
-            try { udpClientHelper.Reset(); } catch { }
-            try { netHelper.Reset(); } catch { }
-            try { mqttClientHelper.Reset(); } catch { }
-            try { knxClientHelper.Reset(); } catch { }
+            try
+            {
+                serialPortHelper.Reset();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                tcpClientHelper.Reset();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                udpClientHelper.Reset();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                netHelper.Reset();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                mqttClientHelper.Reset();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                knxClientHelper.Reset();
+            }
+            catch
+            {
+            }
         }
-
     }
-
 }

@@ -1,43 +1,40 @@
-﻿/*
-    This file is part of MIG Project source code.
-
-    MIG is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    MIG is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with MIG.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: https://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿// <copyright file="WebServiceUtility.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace MIG.Gateways
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using System.Text.RegularExpressions;
+
     public class WebServiceUtility
     {
-
-
         public static void WriteStringToContext(System.Net.HttpListenerContext context, string returnValue)
         {
             Encoding encoding = context.Response.ContentEncoding;
             if (encoding == null)
+            {
                 encoding = Encoding.GetEncoding("ISO-8859-1");
+            }
+
             WriteBytesToContext(context, encoding.GetBytes(returnValue));
         }
 
@@ -52,18 +49,18 @@ namespace MIG.Gateways
             }
             catch
             {
-                // TODO: add error logging 
+                // TODO: add error logging
             }
         }
 
-
-        // code adapted from
-        // http://stackoverflow.com/questions/8466703/httplistener-and-file-upload
-
-        public static String GetBoundary(String contentType)
+        // code adapted from htp://stackoverflow.com/questions/8466703/httplistener-and-file-upload
+        public static string GetBoundary(string contentType)
         {
             if (contentType == null)
-                return "";
+            {
+                return string.Empty;
+            }
+
             return /*"--" + */ contentType.Split(';')[1].Split('=')[1];
         }
 
@@ -110,13 +107,14 @@ namespace MIG.Gateways
                     buffer = new byte[totalBytesRead];
                     Buffer.BlockCopy(readBuffer, 0, buffer, 0, totalBytesRead);
                 }
+
                 return buffer;
             }
             finally
             {
                 if (stream.CanSeek)
                 {
-                    stream.Position = originalPosition; 
+                    stream.Position = originalPosition;
                 }
             }
         }
@@ -132,22 +130,23 @@ namespace MIG.Gateways
             if (parser.Success)
             {
                 var fileName = parser.Filename;
-                if (!String.IsNullOrWhiteSpace(outputPath) && Directory.Exists(outputPath))
+                if (!string.IsNullOrWhiteSpace(outputPath) && Directory.Exists(outputPath))
                 {
-                    Array.ForEach(Path.GetInvalidFileNameChars(), c => fileName = fileName.Replace(c.ToString(), String.Empty));
+                    Array.ForEach(Path.GetInvalidFileNameChars(), c => fileName = fileName.Replace(c.ToString(), string.Empty));
                     outputPath = Path.Combine(outputPath, fileName);
                 }
+
                 File.WriteAllBytes(outputPath, parser.FileContents);
             }
+
             return outputPath;
         }
-
     }
 
     public class MultipartParser
     {
         public MultipartParser(byte[] data)
-        {   
+        {
             this.Parse(data, Encoding.UTF8);
         }
 
@@ -211,7 +210,7 @@ namespace MIG.Gateways
 
             if (startPos != -1)
             {
-                while ((startPos + index) < searchWithin.Length)
+                while (startPos + index < searchWithin.Length)
                 {
                     if (searchWithin[startPos + index] == serachFor[index])
                     {
@@ -228,6 +227,7 @@ namespace MIG.Gateways
                         {
                             return -1;
                         }
+
                         index = 0;
                     }
                 }

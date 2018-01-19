@@ -1,48 +1,42 @@
-﻿/*
-    This file is part of MIG Project source code.
-
-    MIG is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    MIG is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with MIG.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: https://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using MIG.Utility;
-using MIG.Config;
+﻿// <copyright file="TcpSocketGateway.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace MIG.Gateways
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using MIG.Config;
+    using MIG.Utility;
+
     public class TcpSocketGateway : IMigGateway
     {
         private const int bufferLength = 1024;
 
         private TcpServerChannel server;
+
         private int servicePort = 4502;
 
         public event PreProcessRequestEventHandler PreProcessRequest;
-        public event PostProcessRequestEventHandler PostProcessRequest;
 
-        public TcpSocketGateway()
-        {
-        }
+        public event PostProcessRequestEventHandler PostProcessRequest;
 
         public List<Option> Options { get; set; }
 
@@ -63,17 +57,15 @@ namespace MIG.Gateways
         public bool Start()
         {
             bool success = false;
+
             server = NetworkConnectivity.CreateTcpServerChannel("server");
+
             try
             {
                 server.Connect(servicePort);
                 server.ChannelClientConnected += server_ChannelClientConnected;
                 server.ChannelClientDisconnected += server_ChannelClientDisconnected;
-                //_server.ChannelConnected += 
-                //_server.ChannelDisconnected += 
                 server.DataReceived += server_DataReceived;
-                //_server.DataSent += 
-                //_server.ExceptionOccurred += 
                 server.ExceptionOccurred += server_ExceptionOccurred;
                 success = true;
             }
@@ -81,6 +73,7 @@ namespace MIG.Gateways
             {
                 MigService.Log.Error(e);
             }
+
             return success;
         }
 
@@ -88,11 +81,7 @@ namespace MIG.Gateways
         {
             server.ChannelClientConnected -= server_ChannelClientConnected;
             server.ChannelClientDisconnected -= server_ChannelClientDisconnected;
-            //_server.ChannelConnected -= 
-            //_server.ChannelDisconnected -= 
             server.DataReceived -= server_DataReceived;
-            //_server.DataSent -= 
-            //_server.ExceptionOccurred -= 
             server.ExceptionOccurred -= server_ExceptionOccurred;
             server.Disconnect();
         }
@@ -103,9 +92,13 @@ namespace MIG.Gateways
             var message = encoding.GetString(args.Data, 0, args.DataLength);
             var migContext = new MigContext(ContextSource.TcpSocketGateway, args);
             var migRequest = new MigClientRequest(migContext, new MigInterfaceCommand(message));
+
             OnPreProcessRequest(migRequest);
+
             if (!migRequest.Handled)
+            {
                 OnPostProcessRequest(migRequest);
+            }
         }
 
         private void server_ChannelClientConnected(object sender, ServerConnectionEventArgs args)
@@ -124,26 +117,26 @@ namespace MIG.Gateways
 
         private void server_ChannelClientDisconnected(object sender, ServerConnectionEventArgs args)
         {
-
         }
 
         private void server_ExceptionOccurred(object sender, System.IO.ErrorEventArgs e)
         {
-
         }
 
         protected virtual void OnPreProcessRequest(MigClientRequest request)
         {
             if (request != null && PreProcessRequest != null)
+            {
                 PreProcessRequest(this, new ProcessRequestEventArgs(request));
+            }
         }
 
         protected virtual void OnPostProcessRequest(MigClientRequest request)
         {
             if (request != null && PostProcessRequest != null)
+            {
                 PostProcessRequest(this, new ProcessRequestEventArgs(request));
+            }
         }
-
     }
-
 }

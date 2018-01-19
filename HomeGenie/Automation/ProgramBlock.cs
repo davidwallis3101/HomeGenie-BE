@@ -1,81 +1,92 @@
-/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
-*     Author: Generoso Martello <gene@homegenie.it>
-*     Project Homepage: http://github.com/Bounz/HomeGenie-BE
-*/
-
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using HomeGenie.Automation.Scripting;
-using HomeGenie.Service.Constants;
-using HomeGenie.Automation.Engines;
-using Newtonsoft.Json;
+// <copyright file="ProgramBlock.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation
 {
-    [Serializable()]
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+    using HomeGenie.Automation.Engines;
+    using HomeGenie.Automation.Scripting;
+    using HomeGenie.Service.Constants;
+    using Newtonsoft.Json;
+
+    [Serializable]
     public class ProgramBlock
     {
         private IProgramEngine programEngine;
         private bool isProgramEnabled;
-        private string codeType = "";
+        private string codeType = string.Empty;
 
         // event delegates
         public delegate void EnabledStateChangedEventHandler(object sender, bool isEnabled);
+
         public event EnabledStateChangedEventHandler EnabledStateChanged;
 
         // TODO: v1.1 !!!IMPORTANT!!! deprecate this and move to WizardEngine.cs
         // wizard script public members
         public ConditionType ConditionType { get; set; }
+
         public List<ProgramCondition> Conditions { get; set; }
+
         public List<ProgramCommand> Commands { get; set; }
 
         // TODO: v1.1 !!!IMPORTANT!!! refactor ScriptCondition to ScriptSetup
         // c# program public members
         public string ScriptCondition { get; set; }
+
         public string ScriptSource { get; set; }
+
         public string ScriptErrors { get; set; }
 
         // common public members
-        public string Domain  { get; set; }
+        public string Domain { get; set; }
 
         /// <summary>
         /// Program Id
         /// </summary>
-        public int Address  { get; set; }
+        public int Address { get; set; }
+
         public string Name { get; set; }
+
         public string Description { get; set; }
+
         public string Group { get; set; }
-        public List<ProgramFeature> Features  { get; set; }
+
+        public List<ProgramFeature> Features { get; set; }
+
         public bool AutoRestartEnabled { get; set; }
 
         [XmlIgnore]
         public bool WillRun { get; set; }
+
         [XmlIgnore]
         public bool IsRunning { get; set; }
+
         [XmlIgnore]
         public bool LastConditionEvaluationResult { get; set; }
-        [XmlIgnore]
-        public object OperationLock = new object();
+
+        [XmlIgnore] public object OperationLock = new object();
 
         public DateTime? ActivationTime { get; set; }
+
         public DateTime? TriggerTime { get; set; }
 
         public ProgramBlock()
@@ -86,21 +97,23 @@ namespace HomeGenie.Automation
             Features = new List<ProgramFeature>();
 
             Type = "Wizard";
-            ScriptCondition = "";
-            ScriptSource = "";
-            ScriptErrors = "";
-            //
+            ScriptCondition = string.Empty;
+            ScriptSource = string.Empty;
+            ScriptErrors = string.Empty;
             Commands = new List<ProgramCommand>();
             Conditions = new List<ProgramCondition>();
             ConditionType = ConditionType.None;
-            //
             isProgramEnabled = false;
             IsRunning = false;
         }
 
         public string Type
         {
-            get { return codeType; }
+            get
+            {
+                return codeType;
+            }
+
             set
             {
                 bool changed = codeType != value;
@@ -112,6 +125,7 @@ namespace HomeGenie.Automation
                         programEngine.Unload();
                         programEngine = null;
                     }
+
                     switch (codeType.ToLower())
                     {
                         case "csharp":
@@ -142,7 +156,11 @@ namespace HomeGenie.Automation
 
         public bool IsEnabled
         {
-            get { return isProgramEnabled; }
+            get
+            {
+                return isProgramEnabled;
+            }
+
             set
             {
                 if (isProgramEnabled != value)
@@ -153,33 +171,35 @@ namespace HomeGenie.Automation
                     {
                         ActivationTime = DateTime.UtcNow;
                         if (programEngine != null)
+                        {
                             programEngine.Load();
+                        }
                     }
                     else
                     {
                         if (programEngine != null)
+                        {
                             programEngine.Unload();
+                        }
                     }
+
                     if (EnabledStateChanged != null)
+                    {
                         EnabledStateChanged(this, value);
+                    }
                 }
             }
         }
 
-        [XmlIgnore,JsonIgnore]
+        [XmlIgnore]
+        [JsonIgnore]
         public ProgramEngineBase Engine
         {
             get { return (ProgramEngineBase)programEngine; }
         }
 
-
-
-
-
         // TODO: v1.1 !!!IMPORTANT!!! move this region to a ProgramEngineBase.cs class
-        #region ProgramBase methods
-
-        internal List<ProgramError>  Compile()
+        internal List<ProgramError> Compile()
         {
             return programEngine.Compile();
         }
@@ -191,16 +211,21 @@ namespace HomeGenie.Automation
 
         internal ProgramError GetFormattedError(Exception e, bool isTriggerBlock)
         {
-            var error = new ProgramError {
+            var error = new ProgramError
+            {
                 CodeBlock = isTriggerBlock ? CodeBlockEnum.TC : CodeBlockEnum.CR,
                 Column = 0,
                 Line = 0,
                 ErrorNumber = "-1",
                 ErrorMessage = e.Message
             };
+
             // TODO: can it be null at this point???
             if (programEngine != null)
+            {
                 error = programEngine.GetFormattedError(e, isTriggerBlock);
+            }
+
             return error;
         }
 
@@ -209,8 +234,5 @@ namespace HomeGenie.Automation
         {
             return programEngine.EvaluateCondition();
         }
-
-        #endregion
     }
 }
-

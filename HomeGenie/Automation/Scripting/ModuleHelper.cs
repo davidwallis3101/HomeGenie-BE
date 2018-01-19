@@ -1,35 +1,29 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using HomeGenie.Data;
-using HomeGenie.Service;
+﻿// <copyright file="ModuleHelper.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scripting
 {
+    using System;
+    using HomeGenie.Data;
+    using HomeGenie.Service;
+
     /// <summary>
     /// Module Helper class.\n
     /// This class is a module instance wrapper and it is used as return value of ModulesManager.Get() method.
@@ -62,7 +56,7 @@ namespace HomeGenie.Automation.Scripting
         /// <param name="name">Name.</param>
         public bool Is(string name)
         {
-            return (module.Name.ToLower() == name.ToLower());
+            return module.Name.ToLower() == name.ToLower();
         }
 
         [Obsolete("Use 'Exists' instead")]
@@ -123,6 +117,7 @@ namespace HomeGenie.Automation.Scripting
                     }
                 }
             }
+
             return retval;
         }
 
@@ -143,6 +138,7 @@ namespace HomeGenie.Automation.Scripting
                     break;
                 }
             }
+
             return retval;
         }
 
@@ -154,7 +150,7 @@ namespace HomeGenie.Automation.Scripting
         public bool HasFeature(string feature)
         {
             var parameter = Service.Utility.ModuleParameterGet(module, feature);
-            return (parameter != null && !String.IsNullOrWhiteSpace(parameter.Value));
+            return parameter != null && !string.IsNullOrWhiteSpace(parameter.Value);
         }
 
         /// <summary>
@@ -164,7 +160,7 @@ namespace HomeGenie.Automation.Scripting
         /// <param name="parameter">Parameter.</param>
         public bool HasParameter(string parameter)
         {
-            return (Service.Utility.ModuleParameterGet(module, parameter) != null);
+            return Service.Utility.ModuleParameterGet(module, parameter) != null;
         }
 
         /// <summary>
@@ -180,16 +176,20 @@ namespace HomeGenie.Automation.Scripting
                 {
                     value = Service.Utility.ModuleParameterGet(this.module, parameter);
                 }
-                catch { }
+                catch
+                {
+                }
+
                 // create parameter if does not exists
                 if (value == null)
                 {
-                    value = Service.Utility.ModuleParameterSet(this.module, parameter, "");
+                    value = Service.Utility.ModuleParameterSet(this.module, parameter, string.Empty);
                 }
             }
+
             return value;
         }
-                
+
         public StoreHelper Store(string storeName)
         {
             StoreHelper storage = null;
@@ -197,11 +197,12 @@ namespace HomeGenie.Automation.Scripting
             {
                 storage = new StoreHelper(this.module.Stores, storeName);
             }
+
             return storage;
         }
 
         /// <summary>
-        /// Raise a module parameter event and set the parameter with the specified value. 
+        /// Raise a module parameter event and set the parameter with the specified value.
         /// </summary>
         /// <returns>ModuleHelper.</returns>
         /// <param name="parameter">Parameter name.</param>
@@ -216,8 +217,7 @@ namespace HomeGenie.Automation.Scripting
                     this.Instance.Address,
                     description,
                     parameter,
-                    value
-                );
+                    value);
                 homegenie.RaiseEvent(this, actionEvent);
             }
             catch (Exception ex)
@@ -227,9 +227,9 @@ namespace HomeGenie.Automation.Scripting
                     this.Instance.Address,
                     ex.Message,
                     "Exception.StackTrace",
-                    ex.StackTrace
-                );
+                    ex.StackTrace);
             }
+
             return this;
         }
     }

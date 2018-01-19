@@ -1,35 +1,27 @@
-/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using KNXLib;
-using KNXLib.DPT;
+// <copyright file="KnxClientHelper.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scripting
 {
+    using System;
+    using KNXLib;
 
     /// <summary>
     /// KNX client helper.
@@ -92,15 +84,16 @@ namespace HomeGenie.Automation.Scripting
         /// <param name="remotePort">Remote port.</param>
         public KnxClientHelper EndPoint(string localIp, int localPort, string remoteIp, int remotePort)
         {
-            knxEndPoint = new KnxEndPoint() { 
-                LocalIp = localIp, 
-                LocalPort = localPort, 
-                RemoteIp = remoteIp, 
-                RemotePort = remotePort 
+            knxEndPoint = new KnxEndPoint()
+            {
+                LocalIp = localIp,
+                LocalPort = localPort,
+                RemoteIp = remoteIp,
+                RemotePort = remotePort
             };
             return this;
         }
-        
+
         /// <summary>
         /// Connect to the remote host using the specified port.
         /// </summary>
@@ -111,6 +104,7 @@ namespace HomeGenie.Automation.Scripting
             {
                 knxClient.Disconnect();
             }
+
             if (knxEndPoint == null)
             {
                 knxClient = new KNXConnectionRouting();
@@ -134,6 +128,7 @@ namespace HomeGenie.Automation.Scripting
                     knxClient = new KNXConnectionRouting(knxEndPoint.LocalPort);
                 }
             }
+
             knxClient.Connect();
             knxClient.KNXConnectedDelegate += knxClient_Connected;
             knxClient.KNXDisconnectedDelegate += knxClient_Disconnected;
@@ -141,7 +136,7 @@ namespace HomeGenie.Automation.Scripting
             knxClient.KNXStatusDelegate += knxClient_StatusReceived;
             return this;
         }
-        
+
         /// <summary>
         /// Disconnects from the remote host.
         /// </summary>
@@ -153,9 +148,17 @@ namespace HomeGenie.Automation.Scripting
                 knxClient.KNXDisconnectedDelegate -= knxClient_Disconnected;
                 knxClient.KNXEventDelegate -= knxClient_EventReceived;
                 knxClient.KNXStatusDelegate -= knxClient_StatusReceived;
-                try { knxClient.Disconnect(); } catch { }
+                try
+                {
+                    knxClient.Disconnect();
+                }
+                catch
+                {
+                }
+
                 knxClient = null;
             }
+
             return this;
         }
 
@@ -191,7 +194,7 @@ namespace HomeGenie.Automation.Scripting
             knxClient.Action(address, data);
             return this;
         }
-        
+
         /// <summary>
         /// Send action data to the specified address.
         /// </summary>
@@ -202,7 +205,7 @@ namespace HomeGenie.Automation.Scripting
             knxClient.Action(address, data);
             return this;
         }
-        
+
         /// <summary>
         /// Send action data to the specified address.
         /// </summary>
@@ -255,14 +258,15 @@ namespace HomeGenie.Automation.Scripting
         public object ConvertFromDpt(string type, object data)
         {
             object result;
-            if (data.GetType() == typeof(String))
+            if (data.GetType() == typeof(string))
             {
-                result = knxClient.fromDPT(type, (String)data);
+                result = knxClient.fromDPT(type, (string)data);
             }
             else
             {
                 result = knxClient.fromDPT(type, (byte[])data);
             }
+
             return result;
         }
 
@@ -275,7 +279,7 @@ namespace HomeGenie.Automation.Scripting
             statusChanged = statusChangeAction;
             return this;
         }
-                
+
         /// <summary>
         /// Sets the function to call when a new event is received.
         /// </summary>
@@ -295,14 +299,12 @@ namespace HomeGenie.Automation.Scripting
             statusReceived = statusAction;
             return this;
         }
-        
+
         public void Reset()
         {
             knxEndPoint = null;
             Disconnect();
         }
-
-        #region Private helpers and event delegates
 
         private void knxClient_Connected()
         {
@@ -312,7 +314,6 @@ namespace HomeGenie.Automation.Scripting
             }
         }
 
-        
         private void knxClient_Disconnected()
         {
             if (statusChanged != null)
@@ -328,7 +329,7 @@ namespace HomeGenie.Automation.Scripting
                 eventReceived(address, state);
             }
         }
-        
+
         private void knxClient_StatusReceived(string address, string state)
         {
             if (statusReceived != null)
@@ -336,8 +337,5 @@ namespace HomeGenie.Automation.Scripting
                 statusReceived(address, state);
             }
         }
-
-        #endregion
-
     }
 }

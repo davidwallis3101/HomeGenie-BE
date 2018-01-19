@@ -1,49 +1,43 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using System.IO;
-using System.Net;
-using System.Net.Mail;
-using System.Threading;
-
-using System.Net.NetworkInformation;
-using System.Collections.Specialized;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-using HomeGenie.Service;
-using HomeGenie.Data;
-using HomeGenie.Service.Constants;
-
-using NetClientLib;
-using NLog;
+﻿// <copyright file="NetHelper.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scripting
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Mail;
+    using System.Net.NetworkInformation;
+    using System.Text;
+    using System.Threading;
+    using HomeGenie.Data;
+    using HomeGenie.Service;
+    using HomeGenie.Service.Constants;
+    using NetClientLib;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using NLog;
+
     /// <summary>
     /// Net Helper class.\n
     /// Class instance accessor: **Net**
@@ -53,12 +47,13 @@ namespace HomeGenie.Automation.Scripting
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-        private string _webServiceUrl = "";
+        private string _webServiceUrl = string.Empty;
         private string _method = "post";
-        private string _putData = "";
+        private string _putData = string.Empty;
 
-        private string _mailService = "";
+        private string _mailService = string.Empty;
         private int _mailPort = -1;
+
         // unset
         private bool? _mailSsl;
 
@@ -71,17 +66,14 @@ namespace HomeGenie.Automation.Scripting
 
         // multithread safe lock objects
         private readonly object _smtpSyncLock = new object();
-        //private object httpSyncLock = new object();
 
+        // private object httpSyncLock = new object();
         private readonly HomeGenieService _homegenie;
-
 
         public NetHelper(HomeGenieService hg)
         {
             _homegenie = hg;
         }
-
-        #region SMTP client
 
         /// <summary>
         /// Set the SMTP server address for sending emails.
@@ -132,13 +124,15 @@ namespace HomeGenie.Automation.Scripting
         /// <param name="messageText">Message text.</param>
         public bool SendMessage(string recipients, string subject, string messageText)
         {
-            var mailFrom = "";
+            var mailFrom = string.Empty;
+
             // this is a System Parameter
             var spEmailSender = _homegenie.Parameters.Find(mp => mp.Name == "Messaging.Email.Sender");
-            if (spEmailSender != null && spEmailSender.Value != "")
+            if (spEmailSender != null && spEmailSender.Value != string.Empty)
             {
                 mailFrom = spEmailSender.Value;
             }
+
             return SendMessage(mailFrom, recipients, subject, messageText);
         }
 
@@ -156,29 +150,28 @@ namespace HomeGenie.Automation.Scripting
             var mailFrom = from;
             var mailSubject = subject;
             var mailBody = messageText;
-            //
             Log.Trace("SendMessage: getting smtpSyncLock");
             lock (_smtpSyncLock)
             {
                 Log.Trace("SendMessage: got smtpSyncLock");
                 using (var message = new MailMessage())
                 {
-                    var mailRecipients = recipients.Split(new[] {';', ','}, StringSplitOptions.RemoveEmptyEntries);
+                    var mailRecipients = recipients.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var recipient in mailRecipients)
                     {
                         message.To.Add(recipient);
                     }
+
                     message.Subject = mailSubject;
                     message.From = new MailAddress(mailFrom);
                     message.Body = mailBody;
-                    //
                     for (var a = 0; a < _attachments.Count; a++)
                     {
                         var attachment = new Attachment(new MemoryStream(_attachments.ElementAt(a).Value), _attachments.ElementAt(a).Key);
                         message.Attachments.Add(attachment);
                     }
-                    //
-                    if (_mailService == "")
+
+                    if (_mailService == string.Empty)
                     {
                         // this is a System Parameter
                         var spSmtpServer = _homegenie.Parameters.Find(mp => mp.Name == "Messaging.Email.SmtpServer");
@@ -187,15 +180,17 @@ namespace HomeGenie.Automation.Scripting
                             _mailService = spSmtpServer.Value;
                         }
                     }
+
                     if (_mailPort == -1)
                     {
                         // this is a System Parameter
                         var spSmtpPort = _homegenie.Parameters.Find(mp => mp.Name == "Messaging.Email.SmtpPort");
                         if (spSmtpPort != null && spSmtpPort.DecimalValue > 0)
                         {
-                            _mailPort = (int) spSmtpPort.DecimalValue;
+                            _mailPort = (int)spSmtpPort.DecimalValue;
                         }
                     }
+
                     if (!_mailSsl.HasValue)
                     {
                         // this is a System Parameter
@@ -207,29 +202,33 @@ namespace HomeGenie.Automation.Scripting
                             _mailSsl = true;
                         }
                     }
+
                     var credentials = _networkCredential;
                     if (credentials == null)
                     {
-                        var username = "";
+                        var username = string.Empty;
+
                         // this is a System Parameter
                         var spSmtpUserName = _homegenie.Parameters.Find(mp => mp.Name == "Messaging.Email.SmtpUserName");
                         if (spSmtpUserName != null)
                         {
                             username = spSmtpUserName.Value;
                         }
+
                         if (!string.IsNullOrWhiteSpace(username))
                         {
-                            var password = "";
+                            var password = string.Empty;
+
                             // this is a System Parameter
                             var spSmtpPassword = _homegenie.Parameters.Find(mp => mp.Name == "Messaging.Email.SmtpPassword");
                             if (spSmtpPassword != null)
                             {
                                 password = spSmtpPassword.Value;
                             }
+
                             credentials = new NetworkCredential(username, password);
                         }
                     }
-                    //
 
                     using (var smtpClient = new SmtpClient(_mailService))
                     {
@@ -241,10 +240,17 @@ namespace HomeGenie.Automation.Scripting
                             {
                                 smtpClient.Port = _mailPort;
                             }
+
                             smtpClient.EnableSsl = _mailSsl == true;
 
-                            Log.Trace("SendMessage: going to send email {0} using mailService '{1}', port '{2}', credentials {3}, using SSL = {4}",
-                                message.ToPrettyJson(), _mailService, _mailPort, credentials.ToPrettyJson(), smtpClient.EnableSsl);
+                            Log.Trace(
+                                "SendMessage: going to send email {0} using mailService '{1}', port '{2}', credentials {3}, using SSL = {4}",
+                                message.ToPrettyJson(),
+                                _mailService,
+                                _mailPort,
+                                credentials.ToPrettyJson(),
+                                smtpClient.EnableSsl);
+
                             smtpClient.Send(message);
                             Log.Trace("Email sent");
                             _attachments.Clear();
@@ -279,11 +285,6 @@ namespace HomeGenie.Automation.Scripting
             t.Start();
         }
 
-        #endregion
-
-
-        #region IMAP client
-
         /// <summary>
         /// IMAP mail client helper.
         /// </summary>
@@ -296,13 +297,8 @@ namespace HomeGenie.Automation.Scripting
             return new ImapClient(host, port, useSsl);
         }
 
-        #endregion
-
-
-        #region HTTP client
-
         /// <summary>
-        /// Set the web service URL to call. 
+        /// Set the web service URL to call.
         /// </summary>
         /// <returns>NetHelper.</returns>
         /// <param name="serviceUrl">Service URL.</param>
@@ -310,13 +306,13 @@ namespace HomeGenie.Automation.Scripting
         /// <example>
         /// Example:
         /// <code>
-        /// var iplocation = Net.WebService("http://freegeoip.net/json/").GetData(); 
+        /// var iplocation = Net.WebService("http://freegeoip.net/json/").GetData();
         /// Program.Notify("IP to Location", iplocation.city);
         /// </code>
         /// </example>
         public NetHelper WebService(string serviceUrl)
         {
-            _method = "";
+            _method = string.Empty;
             _customHeaders.Clear();
             _webServiceUrl = serviceUrl;
             return this;
@@ -362,8 +358,9 @@ namespace HomeGenie.Automation.Scripting
         /// <returns>String containing the server response.</returns>
         public string Call()
         {
-            string returnvalue = "";
-            //lock(httpSyncLock)
+            string returnvalue = string.Empty;
+
+            // lock(httpSyncLock)
             using (var webClient = new WebClient())
             {
                 try
@@ -377,10 +374,14 @@ namespace HomeGenie.Automation.Scripting
                     {
                         webClient.UseDefaultCredentials = true;
                     }
+
                     webClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)");
                     if (_customHeaders.Count > 0)
+                    {
                         webClient.Headers.Add(_customHeaders);
-                    if (_method == "")
+                    }
+
+                    if (_method == string.Empty)
                     {
                         returnvalue = webClient.DownloadString(_webServiceUrl);
                     }
@@ -400,6 +401,7 @@ namespace HomeGenie.Automation.Scripting
                     webClient.Dispose();
                 }
             }
+
             return returnvalue;
         }
 
@@ -438,6 +440,7 @@ namespace HomeGenie.Automation.Scripting
                     returnValue = response;
                 }
             }
+
             return returnValue;
         }
 
@@ -448,7 +451,8 @@ namespace HomeGenie.Automation.Scripting
         public byte[] GetBytes()
         {
             byte[] responseBytes = null;
-            //lock(httpSyncLock)
+
+            // lock(httpSyncLock)
             using (var webClient = new WebClient())
             {
                 try
@@ -461,9 +465,13 @@ namespace HomeGenie.Automation.Scripting
                     {
                         webClient.UseDefaultCredentials = true;
                     }
+
                     webClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)");
                     if (_customHeaders.Count > 0)
+                    {
                         webClient.Headers.Add(_customHeaders);
+                    }
+
                     responseBytes = webClient.DownloadData(_webServiceUrl);
                 }
                 catch (Exception ex)
@@ -475,13 +483,9 @@ namespace HomeGenie.Automation.Scripting
                     webClient.Dispose();
                 }
             }
+
             return responseBytes;
         }
-
-        #endregion
-
-
-        #region Ping client
 
         /// <summary>
         /// Ping the specified remote host.
@@ -496,11 +500,11 @@ namespace HomeGenie.Automation.Scripting
             using (var pingClient = new Ping())
             {
                 var options = new PingOptions();
-                //
+
                 // Use the default Ttl value which is 128,
                 // but change the fragmentation behavior.
                 options.DontFragment = true;
-                //
+
                 // Create a buffer of 32 bytes of data to be transmitted.
                 var buffer = Encoding.ASCII.GetBytes(data);
 
@@ -510,20 +514,20 @@ namespace HomeGenie.Automation.Scripting
                     success = true;
                 }
             }
+
             return success;
         }
-
-        #endregion
 
         // TODO: add autodoc comment (HG Event forwarding)
         public NetHelper SignalModuleEvent(string hgAddress, ModuleHelper module, ModuleParameter parameter)
         {
             var eventRouteUrl = "http://" + hgAddress + "/api/" + Domains.HomeAutomation_HomeGenie + "/Interconnection/Events.Push/" + _homegenie.GetHttpServicePort();
+
             // propagate event to remote hg endpoint
             Utility.RunAsyncTask(() =>
             {
                 WebService(eventRouteUrl)
-                    .Put(JsonConvert.SerializeObject(new ModuleEvent(module.Instance, parameter), new JsonSerializerSettings(){ Culture = System.Globalization.CultureInfo.InvariantCulture }))
+                    .Put(JsonConvert.SerializeObject(new ModuleEvent(module.Instance, parameter), new JsonSerializerSettings() { Culture = System.Globalization.CultureInfo.InvariantCulture }))
                     .Call();
             });
             return this;
@@ -549,7 +553,7 @@ namespace HomeGenie.Automation.Scripting
 
         public void Reset()
         {
-            _webServiceUrl = "";
+            _webServiceUrl = string.Empty;
             _mailService = "localhost";
             _networkCredential = null;
         }
@@ -559,19 +563,20 @@ namespace HomeGenie.Automation.Scripting
             protected override WebRequest GetWebRequest(Uri uri)
             {
                 var webRequest = base.GetWebRequest(uri);
+
                 // Disable Keep-Alive (this lead to poor performance, so let's keep it disabled by default)
-                //if (w is HttpWebRequest)
-                //{
+                // if (w is HttpWebRequest)
+                // {
                 //    (w as HttpWebRequest).KeepAlive = false;
-                //}
+                // }
                 // WebClient default timeout set to 10 seconds
                 if (webRequest != null)
+                {
                     webRequest.Timeout = 10 * 1000;
+                }
 
                 return webRequest;
             }
         }
-
     }
-
 }

@@ -1,37 +1,29 @@
-/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Threading;
-
-using MIG;
-
-using HomeGenie;
-using HomeGenie.Data;
-using HomeGenie.Service.Constants;
+// <copyright file="VirtualMeter.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Service
 {
+    using System;
+    using System.Threading;
+    using HomeGenie.Data;
+    using HomeGenie.Service.Constants;
 
     public class VirtualMeter
     {
@@ -78,26 +70,24 @@ namespace HomeGenie.Service
                                 parameter = module.Properties.Find(delegate(ModuleParameter mp) { return mp.Name == Properties.StatusLevel; });
                                 double level = double.Parse(parameter.Value.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
                                 double fuzzyness = (new Random().Next(0, 50) - 25) / 100D;
-                                //
                                 homegenie.RaiseEvent(
-                                    Domains.HomeGenie_System, 
+                                    Domains.HomeGenie_System,
                                     module.Domain,
                                     module.Address,
                                     module.Description,
                                     Properties.MeterWatts,
-                                    level == 0 ? "0.0" : ((watts * level) + fuzzyness).ToString(System.Globalization.CultureInfo.InvariantCulture)
-                                );
-                                //
+                                    level == 0 ? "0.0" : (watts * level + fuzzyness).ToString(System.Globalization.CultureInfo.InvariantCulture));
                                 Thread.Sleep(10);
                             }
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     }
                 }
+
                 Thread.Sleep(reportFrequency);
             }
         }
-
     }
 }
-

@@ -1,34 +1,31 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using HomeGenie.Automation.Scripting;
-
-using Jint;
-using System.Collections.Generic;
-using Jint.Parser;
+﻿// <copyright file="JavascriptEngine.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Engines
 {
+    using System;
+    using System.Collections.Generic;
+    using HomeGenie.Automation.Scripting;
+    using Jint;
+    using Jint.Parser;
+
     public class JavascriptEngine : ProgramEngineBase, IProgramEngine
     {
         internal Engine scriptEngine;
@@ -62,7 +59,8 @@ namespace HomeGenie.Automation.Engines
         }
         ";
 
-        public JavascriptEngine(ProgramBlock pb) : base(pb)
+        public JavascriptEngine(ProgramBlock pb)
+            : base(pb)
         {
         }
 
@@ -78,7 +76,9 @@ namespace HomeGenie.Automation.Engines
             Unload();
 
             if (Homegenie == null)
+            {
                 return false;
+            }
 
             scriptEngine = new Engine();
 
@@ -87,6 +87,7 @@ namespace HomeGenie.Automation.Engines
             scriptEngine.SetValue("hg", hgScriptingHost);
             return true;
         }
+
         public MethodRunResult EvaluateCondition()
         {
             MethodRunResult result = null;
@@ -94,7 +95,7 @@ namespace HomeGenie.Automation.Engines
             result = new MethodRunResult();
             try
             {
-                var sh = (scriptEngine.GetValue("hg").ToObject() as ScriptingHost);
+                var sh = scriptEngine.GetValue("hg").ToObject() as ScriptingHost;
                 scriptEngine.Execute(jsScript);
                 result.ReturnValue = sh.ExecuteProgramCode || ProgramBlock.WillRun;
             }
@@ -102,6 +103,7 @@ namespace HomeGenie.Automation.Engines
             {
                 result.Exception = e;
             }
+
             return result;
         }
 
@@ -109,7 +111,8 @@ namespace HomeGenie.Automation.Engines
         {
             MethodRunResult result = null;
             var jsScript = initScript + ProgramBlock.ScriptSource;
-            //scriptEngine.Options.AllowClr(false);
+
+            // scriptEngine.Options.AllowClr(false);
             result = new MethodRunResult();
             try
             {
@@ -119,18 +122,22 @@ namespace HomeGenie.Automation.Engines
             {
                 result.Exception = e;
             }
+
             return result;
         }
 
         public void Reset()
         {
             if (hgScriptingHost != null)
+            {
                 hgScriptingHost.Reset();
+            }
         }
 
         public ProgramError GetFormattedError(Exception e, bool isTriggerBlock)
         {
-            ProgramError error = new ProgramError() {
+            ProgramError error = new ProgramError()
+            {
                 CodeBlock = isTriggerBlock ? CodeBlockEnum.TC : CodeBlockEnum.CR,
                 Column = 0,
                 Line = 0,
@@ -146,7 +153,8 @@ namespace HomeGenie.Automation.Engines
             List<ProgramError> errors = new List<ProgramError>();
 
             JavaScriptParser jp = new JavaScriptParser(false);
-            //ParserOptions po = new ParserOptions();
+
+            // ParserOptions po = new ParserOptions();
             try
             {
                 jp.Parse(ProgramBlock.ScriptCondition);
@@ -158,10 +166,12 @@ namespace HomeGenie.Automation.Engines
                 {
                     string[] error = e.Message.Split(':');
                     string message = error[1];
-                    if (message != "hg is not defined") // TODO: find a better solution for this
+                    // TODO: find a better solution for this
+                    if (message != "hg is not defined")
                     {
                         int line = int.Parse(error[0].Split(' ')[1]);
-                        errors.Add(new ProgramError() {
+                        errors.Add(new ProgramError()
+                        {
                             Line = line,
                             ErrorMessage = message,
                             CodeBlock = CodeBlockEnum.TC
@@ -169,7 +179,7 @@ namespace HomeGenie.Automation.Engines
                     }
                 }
             }
-            //
+
             try
             {
                 jp.Parse(ProgramBlock.ScriptSource);
@@ -181,10 +191,12 @@ namespace HomeGenie.Automation.Engines
                 {
                     string[] error = e.Message.Split(':');
                     string message = error[1];
-                    if (message != "hg is not defined") // TODO: find a better solution for this
+                    // TODO: find a better solution for this
+                    if (message != "hg is not defined")
                     {
                         int line = int.Parse(error[0].Split(' ')[1]);
-                        errors.Add(new ProgramError() {
+                        errors.Add(new ProgramError()
+                        {
                             Line = line,
                             ErrorMessage = message,
                             CodeBlock = CodeBlockEnum.CR
@@ -195,7 +207,5 @@ namespace HomeGenie.Automation.Engines
 
             return errors;
         }
-
     }
 }
-

@@ -1,44 +1,40 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-using HomeGenie.Automation;
-using MIG;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using HomeGenie.Service;
-using System.IO;
-using System.Net;
-using System.Xml.Serialization;
-using Newtonsoft.Json;
-using HomeGenie.Service.Constants;
-using HomeGenie.Automation.Scheduler;
-using Microsoft.Scripting.Hosting;
-using Microsoft.Scripting;
-using CronExpressionDescriptor;
-using HomeGenie.Automation.Engines;
-using Innovative.SolarCalculator;
+﻿// <copyright file="Automation.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Service.Handlers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Net;
+    using System.Text;
+    using CronExpressionDescriptor;
+    using HomeGenie.Automation;
+    using HomeGenie.Automation.Engines;
+    using HomeGenie.Automation.Scheduler;
+    using HomeGenie.Service;
+    using HomeGenie.Service.Constants;
+    using Innovative.SolarCalculator;
+    using MIG;
+    using Newtonsoft.Json;
+
     public class Automation
     {
         private HomeGenieService homegenie;
@@ -51,11 +47,10 @@ namespace HomeGenie.Service.Handlers
         public void ProcessRequest(MigClientRequest request)
         {
             var migCommand = request.Command;
-            string streamContent = "";
+            string streamContent = string.Empty;
             ProgramBlock currentProgram;
             ProgramBlock newProgram;
-            string sketchFile = "", sketchFolder = "";
-            //
+            string sketchFile = string.Empty, sketchFolder = string.Empty;
             homegenie.ExecuteAutomationRequest(migCommand);
             if (migCommand.Command.StartsWith("Macro."))
             {
@@ -85,12 +80,12 @@ namespace HomeGenie.Service.Handlers
                     case "fixed":
                         double secs = double.Parse(
                             migCommand.GetOption(1),
-                            System.Globalization.CultureInfo.InvariantCulture
-                        );
+                            System.Globalization.CultureInfo.InvariantCulture);
                         homegenie.ProgramManager.MacroRecorder.DelayType = MacroDelayType.Fixed;
                         homegenie.ProgramManager.MacroRecorder.DelaySeconds = secs;
                         break;
                     }
+
                     break;
                 case "Macro.GetDelay":
                     request.ResponseData = "{ \"DelayType\" : \"" + homegenie.ProgramManager.MacroRecorder.DelayType + "\", \"DelayOptions\" : \"" + homegenie.ProgramManager.MacroRecorder.DelaySeconds + "\" }";
@@ -109,13 +104,18 @@ namespace HomeGenie.Service.Handlers
                         newSchedule.CronExpression,
                         newSchedule.Data,
                         newSchedule.Description,
-                        newSchedule.Script
-                    );
+                        newSchedule.Script);
                     if (newSchedule.BoundDevices != null)
-                        item.BoundDevices = newSchedule.BoundDevices;
-                    if (newSchedule.BoundModules != null)
-                        item.BoundModules = newSchedule.BoundModules;
-                    homegenie.UpdateSchedulerDatabase();
+                        {
+                            item.BoundDevices = newSchedule.BoundDevices;
+                        }
+
+                        if (newSchedule.BoundModules != null)
+                        {
+                            item.BoundModules = newSchedule.BoundModules;
+                        }
+
+                        homegenie.UpdateSchedulerDatabase();
                     break;
                 case "Scheduling.Delete":
                     homegenie.ProgramManager.SchedulerService.Remove(migCommand.GetOption(0));
@@ -137,14 +137,20 @@ namespace HomeGenie.Service.Handlers
                     int.TryParse(migCommand.GetOption(0), out hours);
                     DateTime dateStart = DateTime.Today.ToUniversalTime();
                     string startFrom = migCommand.GetOption(1);
-                    if (!String.IsNullOrWhiteSpace(startFrom))
-                        dateStart = Utility.JavascriptToDate(long.Parse(startFrom)); 
-                    List<dynamic> nextList = new List<dynamic>();
+                    if (!string.IsNullOrWhiteSpace(startFrom))
+                        {
+                            dateStart = Utility.JavascriptToDate(long.Parse(startFrom));
+                        }
+
+                        List<dynamic> nextList = new List<dynamic>();
                     foreach (var ce in homegenie.ProgramManager.SchedulerService.Items)
                     {
                         if (!ce.IsEnabled)
-                            continue;
-                        var evt = new { Name = ce.Name, Description = ce.Description, RunScript = !String.IsNullOrWhiteSpace(ce.Script), Occurrences = new List<double>() };
+                            {
+                                continue;
+                            }
+
+                            var evt = new { Name = ce.Name, Description = ce.Description, RunScript = !string.IsNullOrWhiteSpace(ce.Script), Occurrences = new List<double>() };
                         var d = dateStart;
                         var dateEnd = dateStart.AddHours(hours);
                         var occurs = homegenie.ProgramManager.SchedulerService.GetScheduling(dateStart, dateEnd, ce.CronExpression);
@@ -153,9 +159,13 @@ namespace HomeGenie.Service.Handlers
                         {
                             evt.Occurrences.Add(Utility.DateToJavascript(dt.ToUniversalTime()));
                         }
+
                         if (evt.Occurrences.Count > 0)
-                            nextList.Add(evt);
-                    }
+                            {
+                                nextList.Add(evt);
+                            }
+                        }
+
                     request.ResponseData = nextList;
                     break;
                 case "Scheduling.List":
@@ -166,11 +176,16 @@ namespace HomeGenie.Service.Handlers
                     request.ResponseData = homegenie.ProgramManager.SchedulerService.Items;
                     break;
                 case "Scheduling.Describe":
-                    var cronDescription = "";
-                    try { 
-                        cronDescription = ExpressionDescriptor.GetDescription(migCommand.GetOption(0).Trim()); 
-                        cronDescription = Char.ToLowerInvariant(cronDescription[0]) + cronDescription.Substring(1);
-                    } catch { }
+                    var cronDescription = string.Empty;
+                    try
+                    {
+                        cronDescription = ExpressionDescriptor.GetDescription(migCommand.GetOption(0).Trim());
+                        cronDescription = char.ToLowerInvariant(cronDescription[0]) + cronDescription.Substring(1);
+                    }
+                    catch
+                    {
+                    }
+
                     request.ResponseData = new ResponseText(cronDescription);
                     break;
                 case "Scheduling.SolarTimes":
@@ -185,15 +200,17 @@ namespace HomeGenie.Service.Handlers
                 {
                     streamContent = request.RequestText;
                 }
-                //
+
                 switch (migCommand.Command)
                 {
                 case "Programs.Import":
                     string archiveName = "homegenie_program_import.hgx";
                     if (File.Exists(archiveName))
-                        File.Delete(archiveName);
-                    //
-                    MIG.Gateways.WebServiceUtility.SaveFile(request.RequestData, archiveName);
+                        {
+                            File.Delete(archiveName);
+                        }
+
+                        MIG.Gateways.WebServiceUtility.SaveFile(request.RequestData, archiveName);
                     int newPid = homegenie.ProgramManager.GeneratePid();
                     newProgram = homegenie.PackageManager.ProgramImport(newPid, archiveName, migCommand.GetOption(0));
                     /*
@@ -243,14 +260,14 @@ namespace HomeGenie.Service.Handlers
                     }
                     */
                     homegenie.UpdateProgramsDatabase();
-                    //migCommand.response = JsonHelper.GetSimpleResponse(programblock.Address);
+
+                    // migCommand.response = JsonHelper.GetSimpleResponse(programblock.Address);
                     request.ResponseData = newProgram.Address.ToString();
                     break;
 
                 case "Programs.Export":
                     currentProgram = homegenie.ProgramManager.Programs.Find(p => p.Address == int.Parse(migCommand.GetOption(0)));
                     string filename = currentProgram.Address + "-" + currentProgram.Name.Replace(" ", "_");
-                    //
                     var writerSettings = new System.Xml.XmlWriterSettings();
                     writerSettings.Indent = true;
                     writerSettings.Encoding = Encoding.UTF8;
@@ -259,13 +276,14 @@ namespace HomeGenie.Service.Handlers
                     var writer = System.Xml.XmlWriter.Create(builder, writerSettings);
                     programSerializer.Serialize(writer, currentProgram);
                     writer.Close();
-                    //
                     if (currentProgram.Type.ToLower() == "arduino")
                     {
-                        string arduinoBundle = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                                                            Utility.GetTmpFolder(),
-                                                           "export",
-                                                            filename + ".zip");
+                        string arduinoBundle = Path.Combine(
+                            AppDomain.CurrentDomain.BaseDirectory,
+                            Utility.GetTmpFolder(),
+                            "export",
+                            filename + ".zip");
+
                         if (File.Exists(arduinoBundle))
                         {
                             File.Delete(arduinoBundle);
@@ -274,11 +292,11 @@ namespace HomeGenie.Service.Handlers
                         {
                             Directory.CreateDirectory(Path.GetDirectoryName(arduinoBundle));
                         }
+
                         string mainProgramFile = Path.Combine(Path.GetDirectoryName(arduinoBundle), "program.hgx");
                         File.WriteAllText(
                             mainProgramFile,
-                            builder.ToString()
-                        );
+                            builder.ToString());
                         Utility.AddFileToZip(arduinoBundle, mainProgramFile, "program.hgx");
                         sketchFolder = Path.Combine("programs", "arduino", currentProgram.Address.ToString());
                         foreach (string f in Directory.GetFiles(sketchFolder))
@@ -288,29 +306,24 @@ namespace HomeGenie.Service.Handlers
                                 Utility.AddFileToZip(
                                     arduinoBundle,
                                     Path.Combine(sketchFolder, Path.GetFileName(f)),
-                                    Path.Combine(
-                                        "src",
-                                        Path.GetFileName(f)
-                                    )
-                                );
+                                    Path.Combine("src", Path.GetFileName(f)));
                             }
                         }
-                        //
+
                         byte[] bundleData = File.ReadAllBytes(arduinoBundle);
                         (request.Context.Data as HttpListenerContext).Response.AddHeader(
                             "Content-Disposition",
-                            "attachment; filename=\"" + filename + ".zip\""
-                            );
+                            "attachment; filename=\"" + filename + ".zip\"");
                         (request.Context.Data as HttpListenerContext).Response.OutputStream.Write(bundleData, 0, bundleData.Length);
                     }
                     else
                     {
                         (request.Context.Data as HttpListenerContext).Response.AddHeader(
                             "Content-Disposition",
-                            "attachment; filename=\"" + filename + ".hgx\""
-                        );
+                            "attachment; filename=\"" + filename + ".hgx\"");
                         request.ResponseData = builder.ToString();
                     }
+
                     break;
 
                 case "Programs.List":
@@ -328,17 +341,19 @@ namespace HomeGenie.Service.Handlers
                     try
                     {
                         var prg = homegenie.ProgramManager.Programs.Find(p => p.Address == int.Parse(migCommand.GetOption(0)));
-                        var settings = new JsonSerializerSettings{ Formatting = Formatting.Indented };
+                        var settings = new JsonSerializerSettings { Formatting = Formatting.Indented };
                         request.ResponseData = JsonConvert.SerializeObject(prg, settings);
                     }
                     catch (Exception ex)
                     {
                         request.ResponseData = new ResponseText("ERROR: \n" + ex.Message + "\n\n" + ex.StackTrace);
                     }
+
                     break;
 
                 case "Programs.Add":
-                    newProgram = new ProgramBlock() {
+                    newProgram = new ProgramBlock()
+                    {
                         Group = migCommand.GetOption(0),
                         Name = streamContent,
                         Type = "Wizard"
@@ -353,20 +368,21 @@ namespace HomeGenie.Service.Handlers
                     currentProgram = homegenie.ProgramManager.Programs.Find(p => p.Address == int.Parse(migCommand.GetOption(0)));
                     if (currentProgram != null)
                     {
-                        //TODO: remove groups associations as well
+                        // TODO: remove groups associations as well
                         homegenie.ProgramManager.ProgramRemove(currentProgram);
                         homegenie.UpdateProgramsDatabase();
+
                         // remove associated module entry
                         homegenie.Modules.RemoveAll(m => m.Domain == Domains.HomeAutomation_HomeGenie_Automation && m.Address == currentProgram.Address.ToString());
                         homegenie.UpdateModulesDatabase();
                     }
+
                     break;
 
                 case "Programs.Compile":
                 case "Programs.Update":
                     newProgram = JsonConvert.DeserializeObject<ProgramBlock>(streamContent);
                     currentProgram = homegenie.ProgramManager.Programs.Find(p => p.Address == newProgram.Address);
-                        //
                     if (currentProgram == null)
                     {
                         newProgram.Address = homegenie.ProgramManager.GeneratePid();
@@ -381,33 +397,34 @@ namespace HomeGenie.Service.Handlers
                         currentProgram.Description = newProgram.Description;
                         currentProgram.AutoRestartEnabled = newProgram.AutoRestartEnabled;
                         if (typeChanged)
-                            currentProgram.Engine.SetHost(homegenie);
-                        currentProgram.IsEnabled = newProgram.IsEnabled;
+                            {
+                                currentProgram.Engine.SetHost(homegenie);
+                            }
+
+                            currentProgram.IsEnabled = newProgram.IsEnabled;
                         currentProgram.ScriptCondition = newProgram.ScriptCondition;
                         currentProgram.ScriptSource = newProgram.ScriptSource;
                         currentProgram.Commands = newProgram.Commands;
                         currentProgram.Conditions = newProgram.Conditions;
                         currentProgram.ConditionType = newProgram.ConditionType;
+
                         // reset last condition evaluation status
                         currentProgram.LastConditionEvaluationResult = false;
                     }
-                        //
+
                     if (migCommand.Command == "Programs.Compile")
                     {
                         // reset previous error status
                         currentProgram.IsEnabled = false;
                         currentProgram.Engine.StopProgram();
-                        currentProgram.ScriptErrors = "";
-                        //
+                        currentProgram.ScriptErrors = string.Empty;
                         List<ProgramError> errors = homegenie.ProgramManager.CompileScript(currentProgram);
-                        //
                         currentProgram.IsEnabled = newProgram.IsEnabled && errors.Count == 0;
                         currentProgram.ScriptErrors = JsonConvert.SerializeObject(errors);
                         request.ResponseData = currentProgram.ScriptErrors;
                     }
-                        //
+
                     homegenie.UpdateProgramsDatabase();
-                        //
                     homegenie.modules_RefreshPrograms();
                     homegenie.modules_RefreshVirtualModules();
                     homegenie.modules_Sort();
@@ -421,10 +438,11 @@ namespace HomeGenie.Service.Handlers
                         // "main" is a special keyword to indicate the main program sketch file
                         sketchFile = ArduinoAppFactory.GetSketchFile(migCommand.GetOption(0));
                     }
+
                     sketchFile = Path.Combine(sketchFolder, Path.GetFileName(sketchFile));
                     request.ResponseData = new ResponseText(File.ReadAllText(sketchFile));
                     break;
-                    
+
                 case "Programs.Arduino.FileSave":
                     sketchFolder = Path.GetDirectoryName(ArduinoAppFactory.GetSketchFile(migCommand.GetOption(0)));
                     sketchFile = Path.Combine(sketchFolder, Path.GetFileName(migCommand.GetOption(1)));
@@ -434,8 +452,11 @@ namespace HomeGenie.Service.Handlers
                 case "Programs.Arduino.FileAdd":
                     sketchFolder = Path.GetDirectoryName(ArduinoAppFactory.GetSketchFile(migCommand.GetOption(0)));
                     if (!Directory.Exists(sketchFolder))
-                        Directory.CreateDirectory(sketchFolder);
-                    sketchFile = Path.Combine(sketchFolder, Path.GetFileName(migCommand.GetOption(1)));
+                        {
+                            Directory.CreateDirectory(sketchFolder);
+                        }
+
+                        sketchFile = Path.Combine(sketchFolder, Path.GetFileName(migCommand.GetOption(1)));
                     if (File.Exists(sketchFile))
                     {
                         request.ResponseData = new ResponseText("EXISTS");
@@ -452,8 +473,9 @@ namespace HomeGenie.Service.Handlers
                         sw = null;
                         request.ResponseData = new ResponseText("OK");
                     }
+
                     break;
-                    
+
                 case "Programs.Arduino.FileDelete":
                     sketchFolder = Path.GetDirectoryName(ArduinoAppFactory.GetSketchFile(migCommand.GetOption(0)));
                     sketchFile = Path.Combine(sketchFolder, Path.GetFileName(migCommand.GetOption(1)));
@@ -466,6 +488,7 @@ namespace HomeGenie.Service.Handlers
                         File.Delete(sketchFile);
                         request.ResponseData = new ResponseText("OK");
                     }
+
                     break;
 
                 case "Programs.Arduino.FileList":
@@ -478,6 +501,7 @@ namespace HomeGenie.Service.Handlers
                             files.Add(Path.GetFileName(f));
                         }
                     }
+
                     request.ResponseData = files;
                     break;
 
@@ -486,16 +510,16 @@ namespace HomeGenie.Service.Handlers
                     if (currentProgram != null)
                     {
                         // clear any runtime errors before running
-                        currentProgram.ScriptErrors = "";
+                        currentProgram.ScriptErrors = string.Empty;
                         homegenie.ProgramManager.RaiseProgramModuleEvent(
                             currentProgram,
                             Properties.RuntimeError,
-                            ""
-                        );
+                            string.Empty);
                         currentProgram.IsEnabled = true;
                         System.Threading.Thread.Sleep(500);
                         ProgramRun(migCommand.GetOption(0), migCommand.GetOption(1));
                     }
+
                     break;
 
                 case "Programs.Toggle":
@@ -518,9 +542,11 @@ namespace HomeGenie.Service.Handlers
                         catch
                         {
                         }
+
                         currentProgram.IsEnabled = true;
                         homegenie.UpdateProgramsDatabase();
                     }
+
                     break;
 
                 case "Programs.Enable":
@@ -530,6 +556,7 @@ namespace HomeGenie.Service.Handlers
                         currentProgram.IsEnabled = true;
                         homegenie.UpdateProgramsDatabase();
                     }
+
                     break;
 
                 case "Programs.Disable":
@@ -544,11 +571,12 @@ namespace HomeGenie.Service.Handlers
                         catch
                         {
                         }
+
                         homegenie.UpdateProgramsDatabase();
                     }
+
                     break;
                 }
-
             }
         }
 
@@ -578,10 +606,10 @@ namespace HomeGenie.Service.Handlers
                         program.Address.ToString(),
                         "Program Error",
                         Properties.RuntimeError,
-                        "Program is disabled, cannot run."
-                    );
+                        "Program is disabled, cannot run.");
                 }
             }
+
             return program;
         }
 
@@ -600,17 +628,21 @@ namespace HomeGenie.Service.Handlers
                 else
                 {
                     if (!program.IsEnabled)
+                    {
                         program.IsEnabled = true;
+                    }
+
                     try
                     {
                         homegenie.ProgramManager.Run(program, options);
                     }
                     catch
                     {
+                        // TODO Log error
                     }
-                    ;
                 }
             }
+
             return program;
         }
 
@@ -625,6 +657,7 @@ namespace HomeGenie.Service.Handlers
                 program.Engine.StopProgram();
                 homegenie.UpdateProgramsDatabase();
             }
+
             return program;
         }
     }

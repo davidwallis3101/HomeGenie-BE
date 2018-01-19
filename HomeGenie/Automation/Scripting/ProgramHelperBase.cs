@@ -1,13 +1,33 @@
-﻿using System;
-using HomeGenie.Service;
-using MIG;
-using HomeGenie.Automation.Scripting;
-using System.Threading;
-using System.IO;
-using System.Net;
+﻿// <copyright file="ProgramHelperBase.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie
 {
+    using System;
+    using System.IO;
+    using System.Net;
+    using System.Threading;
+    using HomeGenie.Automation.Scripting;
+    using HomeGenie.Service;
+    using MIG;
+
     public class ProgramHelperBase
     {
         protected HomeGenieService homegenie;
@@ -41,25 +61,29 @@ namespace HomeGenie
         /// </example>
         public ProgramHelperBase Say(string sentence, string locale = null, bool goAsync = false)
         {
-            if (String.IsNullOrWhiteSpace(locale))
+            if (string.IsNullOrWhiteSpace(locale))
             {
                 locale = Thread.CurrentThread.CurrentCulture.Name;
             }
+
             try
             {
                 Utility.Say(sentence, locale, goAsync);
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 HomeGenieService.LogError(e);
             }
+
             return this;
         }
+
         // these redundant method definitions are for Jint compatibility
         public ProgramHelperBase Say(string sentence)
         {
             return Say(sentence, null, false);
         }
+
         public ProgramHelperBase Say(string sentence, string locale)
         {
             return Say(sentence, locale, false);
@@ -79,8 +103,15 @@ namespace HomeGenie
                 {
                     byte[] audiodata = webClient.DownloadData(waveUrl);
 
-                    if (!Directory.Exists(outputDirectory)) Directory.CreateDirectory(outputDirectory);
-                    if (File.Exists(file)) File.Delete(file);
+                    if (!Directory.Exists(outputDirectory))
+                    {
+                        Directory.CreateDirectory(outputDirectory);
+                    }
+
+                    if (File.Exists(file))
+                    {
+                        File.Delete(file);
+                    }
 
                     var stream = File.OpenWrite(file);
                     stream.Write(audiodata, 0, audiodata.Length);
@@ -91,10 +122,11 @@ namespace HomeGenie
 
                 Utility.Play(file);
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 HomeGenieService.LogError(e);
             }
+
             return this;
         }
 
@@ -116,7 +148,10 @@ namespace HomeGenie
         public object ApiCall(string apiCommand)
         {
             if (apiCommand.StartsWith("/api/"))
+            {
                 apiCommand = apiCommand.Substring(5);
+            }
+
             return homegenie.InterfaceControl(new MigInterfaceCommand(apiCommand));
         }
 
@@ -142,7 +177,7 @@ namespace HomeGenie
         /// </param>
         public void Run(string programId)
         {
-            Run(programId, "");
+            Run(programId, string.Empty);
         }
 
         /// <summary>
@@ -157,7 +192,7 @@ namespace HomeGenie
         public void Run(string programId, string options)
         {
             var program = homegenie.ProgramManager.Programs.Find(p => p.Address.ToString() == programId || p.Name == programId);
-            if (program != null && !program.IsRunning) //  && program.Address != myProgramId
+            if (program != null && !program.IsRunning)
             {
                 homegenie.ProgramManager.Run(program, options);
             }
@@ -171,12 +206,16 @@ namespace HomeGenie
         public ProgramHelperBase WaitFor(string programId)
         {
             var program = homegenie.ProgramManager.Programs.Find(p => p.Address.ToString() == programId || p.Name == programId);
-            if (program != null) // && program.Address != myProgramId)
+            if (program != null)
             {
                 while (!program.IsRunning)
+                {
                     Thread.Sleep(1000);
+                }
+
                 Thread.Sleep(1000);
             }
+
             return this;
         }
 
@@ -193,6 +232,7 @@ namespace HomeGenie
             {
                 programHelper = new ProgramHelper(homegenie, program.Address);
             }
+
             return programHelper;
         }
 
@@ -209,9 +249,8 @@ namespace HomeGenie
             {
                 programHelper = new ProgramHelper(homegenie, program.Address);
             }
+
             return programHelper;
         }
-
     }
 }
-

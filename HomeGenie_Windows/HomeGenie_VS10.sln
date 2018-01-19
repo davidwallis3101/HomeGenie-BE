@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeGenie", "..\HomeGenie\HomeGenie.csproj", "{BFD3C868-1F62-43FF-8771-CF21825F0C0A}"
 EndProject
@@ -28,6 +28,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIG.Protocols", "..\MIG\MIG.Protocols\MIG.Protocols.csproj", "{C7538C18-D328-4509-B5D7-CDA0491F90F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.WebService", "..\MIG\Tests.WebService\Tests.WebService.csproj", "{E4CB8D80-39EC-4347-8FA1-292904B13AD0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{493E95BB-A60D-4C35-A9AA-E78003FAA9C6}"
+	ProjectSection(SolutionItems) = preProject
+		..\stylecop.json = ..\stylecop.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,26 +68,18 @@ Global
 		{005357C9-7F8E-458E-AFFA-BF84F7D6A6AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{005357C9-7F8E-458E-AFFA-BF84F7D6A6AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{005357C9-7F8E-458E-AFFA-BF84F7D6A6AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{005357C9-7F8E-458E-AFFA-BF84F7D6A6AE}.Default|Any CPU.ActiveCfg = Debug|Any CPU
-		{005357C9-7F8E-458E-AFFA-BF84F7D6A6AE}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{8C90AAEE-6245-4F6F-9D4A-854300C662F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8C90AAEE-6245-4F6F-9D4A-854300C662F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C90AAEE-6245-4F6F-9D4A-854300C662F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C90AAEE-6245-4F6F-9D4A-854300C662F6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C90AAEE-6245-4F6F-9D4A-854300C662F6}.Default|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C90AAEE-6245-4F6F-9D4A-854300C662F6}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{C7538C18-D328-4509-B5D7-CDA0491F90F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C7538C18-D328-4509-B5D7-CDA0491F90F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7538C18-D328-4509-B5D7-CDA0491F90F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7538C18-D328-4509-B5D7-CDA0491F90F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C7538C18-D328-4509-B5D7-CDA0491F90F5}.Default|Any CPU.ActiveCfg = Debug|Any CPU
-		{C7538C18-D328-4509-B5D7-CDA0491F90F5}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{E4CB8D80-39EC-4347-8FA1-292904B13AD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E4CB8D80-39EC-4347-8FA1-292904B13AD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4CB8D80-39EC-4347-8FA1-292904B13AD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4CB8D80-39EC-4347-8FA1-292904B13AD0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4CB8D80-39EC-4347-8FA1-292904B13AD0}.Default|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4CB8D80-39EC-4347-8FA1-292904B13AD0}.Default|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

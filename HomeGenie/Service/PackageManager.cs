@@ -1,44 +1,37 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
-*     Author: Generoso Martello <gene@homegenie.it>
-*     Project Homepage: http://github.com/Bounz/HomeGenie-BE
-*/
-
-using System;
-using System.IO;
-using System.Net;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-
-using HomeGenie.Automation;
-using HomeGenie.Data;
-using HomeGenie.Service.Constants;
-
-using MIG.Config;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿// <copyright file="PackageManager.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Service
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Net;
+    using System.Xml.Serialization;
+    using HomeGenie.Automation;
+    using HomeGenie.Data;
+    using HomeGenie.Service.Constants;
+    using MIG.Config;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+
     public class PackageManager
     {
         private HomeGenieService homegenie;
@@ -57,6 +50,7 @@ namespace HomeGenie.Service
             string installFolder = Path.Combine(tempFolderPath, "pkg");
             dynamic pkgData = null;
             bool success = true;
+
             // Download package specs
             homegenie.RaiseEvent(
                 Domains.HomeGenie_System,
@@ -64,8 +58,7 @@ namespace HomeGenie.Service
                 SourceModule.Master,
                 "HomeGenie Package Installer",
                 Properties.InstallProgressMessage,
-                "= Downloading: package.json"
-            );
+                "= Downloading: package.json");
             using (var client = new WebClient())
             {
                 try
@@ -81,12 +74,13 @@ namespace HomeGenie.Service
                         SourceModule.Master,
                         "HomeGenie Package Installer",
                         Properties.InstallProgressMessage,
-                        "= ERROR: '" + e.Message + "'"
-                    );
+                        "= ERROR: '" + e.Message + "'");
                     success = false;
                 }
+
                 client.Dispose();
             }
+
             // Download and install package files
             if (success && pkgData != null)
             {
@@ -99,12 +93,14 @@ namespace HomeGenie.Service
                         SourceModule.Master,
                         "HomeGenie Package Installer",
                         Properties.InstallProgressMessage,
-                        "= Downloading: " + program.file.ToString()
-                    );
+                        "= Downloading: " + program.file.ToString());
                     Utility.FolderCleanUp(installFolder);
                     string programFile = Path.Combine(installFolder, program.file.ToString());
                     if (File.Exists(programFile))
+                    {
                         File.Delete(programFile);
+                    }
+
                     using (var client = new WebClient())
                     {
                         try
@@ -119,12 +115,13 @@ namespace HomeGenie.Service
                                 SourceModule.Master,
                                 "HomeGenie Package Installer",
                                 Properties.InstallProgressMessage,
-                                "= ERROR: '" + e.Message + "'"
-                            );
+                                "= ERROR: '" + e.Message + "'");
                             success = false;
                         }
+
                         client.Dispose();
                     }
+
                     if (success)
                     {
                         homegenie.RaiseEvent(
@@ -133,9 +130,9 @@ namespace HomeGenie.Service
                             SourceModule.Master,
                             "HomeGenie Package Installer",
                             Properties.InstallProgressMessage,
-                            "= Installing: " + program.name.ToString()
-                        );
+                            "= Installing: " + program.name.ToString());
                         int pid = int.Parse(program.uid.ToString());
+
                         // by default enable package programs after installing them
                         var enabled = true;
                         var oldProgram = homegenie.ProgramManager.ProgramGet(pid);
@@ -147,17 +144,18 @@ namespace HomeGenie.Service
                                 SourceModule.Master,
                                 "HomeGenie Package Installer",
                                 Properties.InstallProgressMessage,
-                                "= Replacing: '" + oldProgram.Name + "' with pid " + pid
-                            );
+                                "= Replacing: '" + oldProgram.Name + "' with pid " + pid);
+
                             // if the program was already installed, inherit IsEnabled
                             enabled = oldProgram.IsEnabled;
                             homegenie.ProgramManager.ProgramRemove(oldProgram);
                         }
+
                         var programBlock = ProgramImport(pid, programFile, program.group.ToString());
                         if (programBlock != null)
                         {
                             string groupName = programBlock.Group;
-                            if (!String.IsNullOrWhiteSpace(groupName))
+                            if (!string.IsNullOrWhiteSpace(groupName))
                             {
                                 // Add automation program group if does not exist
                                 Group newGroup = new Group() { Name = groupName };
@@ -167,6 +165,7 @@ namespace HomeGenie.Service
                                     homegenie.UpdateGroupsDatabase("Automation");
                                 }
                             }
+
                             programBlock.IsEnabled = enabled;
                             homegenie.RaiseEvent(
                                 Domains.HomeGenie_System,
@@ -174,8 +173,7 @@ namespace HomeGenie.Service
                                 SourceModule.Master,
                                 "HomeGenie Package Installer",
                                 Properties.InstallProgressMessage,
-                                "= Installed: '" + program.name.ToString() + "' as pid " + pid
-                            );
+                                "= Installed: '" + program.name.ToString() + "' as pid " + pid);
                         }
                         else
                         {
@@ -184,6 +182,7 @@ namespace HomeGenie.Service
                         }
                     }
                 }
+
                 // Import Widgets in package
                 foreach (var widget in pkgData.widgets)
                 {
@@ -193,12 +192,14 @@ namespace HomeGenie.Service
                         SourceModule.Master,
                         "HomeGenie Package Installer",
                         Properties.InstallProgressMessage,
-                        "= Downloading: " + widget.file.ToString()
-                    );
+                        "= Downloading: " + widget.file.ToString());
                     Utility.FolderCleanUp(installFolder);
                     string widgetFile = Path.Combine(installFolder, widget.file.ToString());
                     if (File.Exists(widgetFile))
+                    {
                         File.Delete(widgetFile);
+                    }
+
                     using (var client = new WebClient())
                     {
                         try
@@ -213,12 +214,13 @@ namespace HomeGenie.Service
                                 SourceModule.Master,
                                 "HomeGenie Package Installer",
                                 Properties.InstallProgressMessage,
-                                "= ERROR: '" + e.Message + "'"
-                            );
+                                "= ERROR: '" + e.Message + "'");
                             success = false;
                         }
+
                         client.Dispose();
                     }
+
                     if (success && WidgetImport(widgetFile, installFolder))
                     {
                         homegenie.RaiseEvent(
@@ -227,8 +229,7 @@ namespace HomeGenie.Service
                             SourceModule.Master,
                             "HomeGenie Package Installer",
                             Properties.InstallProgressMessage,
-                            "= Installed: '" + widget.name.ToString() + "'"
-                        );
+                            "= Installed: '" + widget.name.ToString() + "'");
                     }
                     else
                     {
@@ -236,6 +237,7 @@ namespace HomeGenie.Service
                         success = false;
                     }
                 }
+
                 // Import MIG Interfaces in package
                 foreach (var migface in pkgData.interfaces)
                 {
@@ -245,12 +247,14 @@ namespace HomeGenie.Service
                         SourceModule.Master,
                         "HomeGenie Package Installer",
                         Properties.InstallProgressMessage,
-                        "= Downloading: " + migface.file.ToString()
-                    );
+                        "= Downloading: " + migface.file.ToString());
                     Utility.FolderCleanUp(installFolder);
                     string migfaceFile = Path.Combine(installFolder, migface.file.ToString());
                     if (File.Exists(migfaceFile))
+                    {
                         File.Delete(migfaceFile);
+                    }
+
                     using (var client = new WebClient())
                     {
                         try
@@ -267,12 +271,13 @@ namespace HomeGenie.Service
                                 SourceModule.Master,
                                 "HomeGenie Package Installer",
                                 Properties.InstallProgressMessage,
-                                "= ERROR: '" + e.Message + "'"
-                            );
+                                "= ERROR: '" + e.Message + "'");
                             success = false;
                         }
+
                         client.Dispose();
                     }
+
                     if (success && InterfaceInstall(installFolder))
                     {
                         homegenie.RaiseEvent(
@@ -281,8 +286,7 @@ namespace HomeGenie.Service
                             SourceModule.Master,
                             "HomeGenie Package Installer",
                             Properties.InstallProgressMessage,
-                            "= Installed: '" + migface.name.ToString() + "'"
-                        );
+                            "= Installed: '" + migface.name.ToString() + "'");
                     }
                     else
                     {
@@ -295,6 +299,7 @@ namespace HomeGenie.Service
             {
                 success = false;
             }
+
             if (success)
             {
                 pkgData.folder_url = pkgFolderUrl;
@@ -306,8 +311,7 @@ namespace HomeGenie.Service
                     SourceModule.Master,
                     "HomeGenie Package Installer",
                     Properties.InstallProgressMessage,
-                    "= Status: Package Install Successful"
-                );
+                    "= Status: Package Install Successful");
             }
             else
             {
@@ -317,8 +321,7 @@ namespace HomeGenie.Service
                     SourceModule.Master,
                     "HomeGenie Package Installer",
                     Properties.InstallProgressMessage,
-                    "= Status: Package Install Error"
-                );
+                    "= Status: Package Install Error");
             }
 
             return success;
@@ -347,11 +350,12 @@ namespace HomeGenie.Service
                 {
                     pkgList = JArray.Parse(File.ReadAllText(PackageManager.PACKAGE_LIST_FILE)).ToObject<List<dynamic>>();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // TODO: report exception
                 }
             }
+
             return pkgList;
         }
 
@@ -364,12 +368,13 @@ namespace HomeGenie.Service
                 iface = (Interface)ifaceSerializer.Deserialize(ifaceReader);
                 ifaceReader.Close();
             }
+
             return iface;
         }
 
         public void AddWidgetMapping(string jsonMap)
         {
-            /* 
+            /*
                // example widget mapping
                [
                   {
@@ -390,9 +395,10 @@ namespace HomeGenie.Service
                     mapList.RemoveAll(m => m.MatchProperty.ToString() == map.MatchProperty.ToString() && m.MatchValue.ToString() == map.MatchValue.ToString());
                     mapList.Add(map);
                 }
+
                 File.WriteAllText(mapConfigFile, JsonConvert.SerializeObject(mapList, Formatting.Indented));
             }
-            catch 
+            catch
             {
                 // TODO: report exception
             }
@@ -408,20 +414,28 @@ namespace HomeGenie.Service
                 // Read "widget.info" and, if a mapping is present, add it to "html/pages/control/widgets/configuration.json"
                 var mapping = File.ReadAllText(Path.Combine(importPath, widgetInfoFile));
                 if (mapping.StartsWith("["))
+                {
                     AddWidgetMapping(mapping);
+                }
+
                 foreach (string f in extractedFiles)
                 {
                     // copy only files contained in sub-folders, avoid copying zip-root files
-                    if (Path.GetDirectoryName(f) != "")
+                    if (Path.GetDirectoryName(f) != string.Empty)
                     {
                         string destFolder = Path.Combine(widgetBasePath, Path.GetDirectoryName(f));
                         if (!Directory.Exists(destFolder))
+                        {
                             Directory.CreateDirectory(destFolder);
+                        }
+
                         File.Copy(Path.Combine(importPath, f), Path.Combine(widgetBasePath, f), true);
                     }
                 }
+
                 success = true;
             }
+
             return success;
         }
 
@@ -437,17 +451,29 @@ namespace HomeGenie.Service
                 // Read and uncompress zip file content (arduino program bundle)
                 string zipFileName = archiveName.Replace(".hgx", ".zip");
                 if (File.Exists(zipFileName))
+                {
                     File.Delete(zipFileName);
+                }
+
                 File.Move(archiveName, zipFileName);
                 string destFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Utility.GetTmpFolder(), "import");
                 if (Directory.Exists(destFolder))
+                {
                     Directory.Delete(destFolder, true);
+                }
+
                 Utility.UncompressZip(zipFileName, destFolder);
                 string bundleFolder = Path.Combine("programs", "arduino", newPid.ToString());
                 if (Directory.Exists(bundleFolder))
+                {
                     Directory.Delete(bundleFolder, true);
+                }
+
                 if (!Directory.Exists(Path.Combine("programs", "arduino")))
+                {
                     Directory.CreateDirectory(Path.Combine("programs", "arduino"));
+                }
+
                 Directory.Move(Path.Combine(destFolder, "src"), bundleFolder);
                 reader = new StreamReader(Path.Combine(destFolder, "program.hgx"));
             }
@@ -455,6 +481,7 @@ namespace HomeGenie.Service
             {
                 reader = new StreamReader(archiveName);
             }
+
             var serializer = new XmlSerializer(typeof(ProgramBlock));
             newProgram = (ProgramBlock)serializer.Deserialize(reader);
             reader.Close();
@@ -464,45 +491,48 @@ namespace HomeGenie.Service
             homegenie.ProgramManager.ProgramAdd(newProgram);
 
             newProgram.IsEnabled = false;
-            newProgram.ScriptErrors = "";
+            newProgram.ScriptErrors = string.Empty;
             newProgram.Engine.SetHost(homegenie);
 
             if (newProgram.Type.ToLower() != "arduino")
             {
                 homegenie.ProgramManager.CompileScript(newProgram);
             }
+
             return newProgram;
         }
 
         public bool InterfaceInstall(string sourceFolder)
         {
             bool success = false;
+
             // install the interface package
             string configFile = Path.Combine(sourceFolder, "configuration.xml");
             var iface = GetInterfaceConfig(configFile);
             if (iface != null)
             {
                 File.Delete(configFile);
-                //
+
                 // TODO: !IMPORTANT!
                 // TODO: since AppDomains are not implemented in MIG, a RESTART is required to load the new Assembly
                 // TODO: HG should ask for RESTART in the UI
                 homegenie.MigService.RemoveInterface(iface.Domain);
-                //
                 string configletName = iface.Domain.Substring(iface.Domain.LastIndexOf(".") + 1).ToLower();
                 string configletPath = Path.Combine("html", "pages", "configure", "interfaces", "configlet", configletName + ".html");
                 if (File.Exists(configletPath))
                 {
                     File.Delete(configletPath);
                 }
+
                 File.Move(Path.Combine(sourceFolder, "configlet.html"), configletPath);
-                //
                 string logoPath = Path.Combine("html", "images", "interfaces", configletName + ".png");
                 if (File.Exists(logoPath))
                 {
                     File.Delete(logoPath);
                 }
+
                 File.Move(Path.Combine(sourceFolder, "logo.png"), logoPath);
+
                 // copy other interface files to mig folder (dll and dependencies)
                 string migFolder = Path.Combine("lib", "mig");
                 DirectoryInfo dir = new DirectoryInfo(sourceFolder);
@@ -511,16 +541,27 @@ namespace HomeGenie.Service
                     string destFile = Path.Combine(migFolder, Path.GetFileName(f.FullName));
                     if (File.Exists(destFile))
                     {
-                        try { File.Delete(destFile + ".old"); } catch { }
-                        try 
+                        try
+                        {
+                            File.Delete(destFile + ".old");
+                        }
+                        catch
+                        {
+                        }
+
+                        try
                         {
                             File.Move(destFile, destFile + ".old");
                             File.Delete(destFile + ".old");
-                        } catch  { }
+                        }
+                        catch
+                        {
+                        }
                     }
+
                     File.Move(f.FullName, destFile);
                 }
-                //
+
                 homegenie.SystemConfiguration.MigService.Interfaces.RemoveAll(i => i.Domain == iface.Domain);
                 homegenie.SystemConfiguration.MigService.Interfaces.Add(iface);
                 homegenie.SystemConfiguration.Update();
@@ -528,9 +569,8 @@ namespace HomeGenie.Service
 
                 success = true;
             }
+
             return success;
         }
-
     }
 }
-

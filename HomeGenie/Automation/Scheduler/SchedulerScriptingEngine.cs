@@ -1,34 +1,31 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
-*     Author: Generoso Martello <gene@homegenie.it>
-*     Project Homepage: http://github.com/Bounz/HomeGenie-BE
-*/
-
-using System;
-using System.Threading;
-using HomeGenie.Service;
-using HomeGenie.Service.Constants;
-
-using Jint;
+﻿// <copyright file="SchedulerScriptingEngine.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scheduler
 {
+    using System;
+    using System.Threading;
+    using HomeGenie.Service;
+    using HomeGenie.Service.Constants;
+    using Jint;
+
     public class SchedulerScriptingEngine
     {
         private HomeGenieService homegenie;
@@ -118,14 +115,18 @@ namespace HomeGenie.Automation.Scheduler
 
         public void StartScript()
         {
-            if (homegenie == null || eventItem == null || isRunning || String.IsNullOrWhiteSpace(eventItem.Script))
+            if (homegenie == null || eventItem == null || isRunning || string.IsNullOrWhiteSpace(eventItem.Script))
+            {
                 return;
-            
+            }
+
             if (programThread != null)
+            {
                 StopScript();
+            }
 
             isRunning = true;
-            homegenie.RaiseEvent(this, Domains.HomeAutomation_HomeGenie, SourceModule.Scheduler, eventItem.Name, Properties.SchedulerScriptStatus, eventItem.Name+":Start");
+            homegenie.RaiseEvent(this, Domains.HomeAutomation_HomeGenie, SourceModule.Scheduler, eventItem.Name, Properties.SchedulerScriptStatus, eventItem.Name + ":Start");
 
             programThread = new Thread(() =>
             {
@@ -134,7 +135,7 @@ namespace HomeGenie.Automation.Scheduler
                     MethodRunResult result = null;
                     try
                     {
-                        scriptEngine.Execute(initScript+eventItem.Script);
+                        scriptEngine.Execute(initScript + eventItem.Script);
                     }
                     catch (Exception ex)
                     {
@@ -144,7 +145,9 @@ namespace HomeGenie.Automation.Scheduler
                     programThread = null;
                     isRunning = false;
                     if (result != null && result.Exception != null && !result.Exception.GetType().Equals(typeof(System.Reflection.TargetException)))
-                        homegenie.RaiseEvent(this, Domains.HomeAutomation_HomeGenie, SourceModule.Scheduler, eventItem.Name, Properties.SchedulerScriptStatus, "Error ("+result.Exception.Message.Replace('\n', ' ').Replace('\r', ' ')+")");
+                    {
+                        homegenie.RaiseEvent(this, Domains.HomeAutomation_HomeGenie, SourceModule.Scheduler, eventItem.Name, Properties.SchedulerScriptStatus, "Error (" + result.Exception.Message.Replace('\n', ' ').Replace('\r', ' ') + ")");
+                    }
                 }
                 catch (ThreadAbortException)
                 {
@@ -173,10 +176,17 @@ namespace HomeGenie.Automation.Scheduler
                 try
                 {
                     if (!programThread.Join(1000))
+                    {
                         programThread.Abort();
-                } catch { }
+                    }
+                }
+                catch
+                {
+                }
+
                 programThread = null;
             }
+
             if (hgScriptingHost != null)
             {
                 hgScriptingHost.OnModuleUpdate(null);
@@ -189,7 +199,5 @@ namespace HomeGenie.Automation.Scheduler
             var moduleEvent = (HomeGenie.Automation.ProgramManager.RoutedEvent)eventData;
             hgScriptingHost.RouteModuleEvent(moduleEvent);
         }
-
     }
 }
-

@@ -1,42 +1,41 @@
-/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using HomeGenie.Service.Constants;
-using HomeGenie.Service;
-using HomeGenie.Data;
-using MIG;
-using System.Threading;
-using System.Globalization;
-using System.Collections.Generic;
-using HomeGenie.Automation.Scripting;
+// <copyright file="WizardEngine.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Engines
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Threading;
+    using HomeGenie.Automation.Scripting;
+    using HomeGenie.Data;
+    using HomeGenie.Service;
+    using HomeGenie.Service.Constants;
+    using MIG;
+
     public class WizardEngine : ProgramEngineBase, IProgramEngine
     {
         private ScriptingHost hgScriptingHost;
 
-        public WizardEngine(ProgramBlock pb) : base(pb)
+        public WizardEngine(ProgramBlock pb)
+            : base(pb)
         {
         }
 
@@ -49,13 +48,16 @@ namespace HomeGenie.Automation.Engines
         public bool Load()
         {
             if (Homegenie == null)
+            {
                 return false;
+            }
 
             if (hgScriptingHost != null)
             {
                 this.Reset();
                 hgScriptingHost = null;
             }
+
             hgScriptingHost = new ScriptingHost();
             hgScriptingHost.SetHost(Homegenie, ProgramBlock.Address);
 
@@ -74,6 +76,7 @@ namespace HomeGenie.Automation.Engines
             {
                 result.Exception = e;
             }
+
             return result;
         }
 
@@ -88,18 +91,22 @@ namespace HomeGenie.Automation.Engines
             {
                 result.Exception = e;
             }
+
             return result;
         }
 
         public void Reset()
         {
             if (hgScriptingHost != null)
+            {
                 hgScriptingHost.Reset();
+            }
         }
 
         public ProgramError GetFormattedError(Exception e, bool isTriggerBlock)
         {
-            ProgramError error = new ProgramError() {
+            ProgramError error = new ProgramError()
+            {
                 CodeBlock = isTriggerBlock ? CodeBlockEnum.TC : CodeBlockEnum.CR,
                 Column = 0,
                 Line = 0,
@@ -117,7 +124,7 @@ namespace HomeGenie.Automation.Engines
 
         private bool EvaluateCondition(List<ProgramCondition> conditions)
         {
-            bool isConditionSatisfied = (conditions.Count > 0);
+            bool isConditionSatisfied = conditions.Count > 0;
             for (int c = 0; c < conditions.Count; c++)
             {
                 // check for OR logic operator
@@ -129,11 +136,11 @@ namespace HomeGenie.Automation.Engines
                     }
                     else
                     {
-                        isConditionSatisfied = (c < conditions.Count - 1);
+                        isConditionSatisfied = c < conditions.Count - 1;
                         continue;
                     }
                 }
-                //
+
                 bool res = false;
                 try
                 {
@@ -143,8 +150,10 @@ namespace HomeGenie.Automation.Engines
                 {
                     // TODO: report/handle exception
                 }
-                isConditionSatisfied = (isConditionSatisfied && res);
+
+                isConditionSatisfied = isConditionSatisfied && res;
             }
+
             return isConditionSatisfied;
         }
 
@@ -159,7 +168,6 @@ namespace HomeGenie.Automation.Engines
                     switch (commands[x].Target)
                     {
                     case SourceModule.Automation:
-                        //
                         string cs = commands[x].CommandString;
                         switch (cs)
                         {
@@ -170,8 +178,9 @@ namespace HomeGenie.Automation.Engines
                             // TODO: implement check for contiguous repeat statements
                             if (repeatCount <= 0)
                             {
-                                repeatCount = (int)(double.Parse(commands[x].CommandArguments, System.Globalization.CultureInfo.InvariantCulture));
+                                repeatCount = (int)double.Parse(commands[x].CommandArguments, System.Globalization.CultureInfo.InvariantCulture);
                             }
+
                             if (--repeatCount == 0)
                             {
                                 repeatStartLine = x + 1;
@@ -180,14 +189,16 @@ namespace HomeGenie.Automation.Engines
                             {
                                 x = repeatStartLine - 1;
                             }
+
                             break;
                         case "Program.Run":
                             string programId = commands[x].CommandArguments;
                             var programToRun = Homegenie.ProgramManager.Programs.Find(p => p.Address.ToString() == programId || p.Name == programId);
                             if (programToRun != null /*&& programToRun.Address != program.Address*/ && !programToRun.IsRunning)
                             {
-                                Homegenie.ProgramManager.Run(programToRun, "");
+                                Homegenie.ProgramManager.Run(programToRun, string.Empty);
                             }
+
                             break;
                         case "Program.WaitFor":
                             hgScriptingHost.Program.WaitFor(commands[x].CommandArguments);
@@ -204,6 +215,7 @@ namespace HomeGenie.Automation.Engines
                                 language = sentence.Substring(lidx + 1);
                                 sentence = sentence.Substring(0, lidx);
                             }
+
                             hgScriptingHost.Program.Say(sentence, language);
                             break;
                         default:
@@ -212,7 +224,7 @@ namespace HomeGenie.Automation.Engines
                             Homegenie.ExecuteAutomationRequest(new MigInterfaceCommand(wrequest));
                             break;
                         }
-                        //
+
                         break;
                     }
                 }
@@ -220,7 +232,7 @@ namespace HomeGenie.Automation.Engines
                 {
                     ExecuteCommand(commands[x]);
                 }
-                //
+
                 Thread.Sleep(10);
             }
         }
@@ -229,19 +241,17 @@ namespace HomeGenie.Automation.Engines
         {
             bool returnValue = false;
             string comparisonValue = c.ComparisonValue;
-            //
             if (c.Domain == Domains.HomeAutomation_HomeGenie && (c.Target == SourceModule.Scheduler || c.Target == SourceModule.Automation) && (c.Property == "Scheduler.TimeEvent" || c.Property == "Scheduler.CronEvent"))
             {
                 return Homegenie.ProgramManager.SchedulerService.IsScheduling(DateTime.Now, c.ComparisonValue);
             }
-            //
+
             // if the comparison value starts with ":", then the value is read from another module property
             // eg: ":HomeAutomation.X10/B3/Level"
-            //
             if (comparisonValue.StartsWith(":"))
             {
                 string[] propertyPath = comparisonValue.Substring(1).Split('/');
-                comparisonValue = "";
+                comparisonValue = string.Empty;
                 if (propertyPath.Length >= 3)
                 {
                     string domain = propertyPath[0];
@@ -253,7 +263,7 @@ namespace HomeGenie.Automation.Engines
                         // abbreviated path, eg: ":X10/B3/Level"
                         targetModule = Homegenie.Modules.Find(m => m.Domain.EndsWith("." + domain) && m.Address == address);
                     }
-                    //
+
                     if (targetModule != null)
                     {
                         var mprop = Utility.ModuleParameterGet(targetModule, propertyName);
@@ -264,10 +274,9 @@ namespace HomeGenie.Automation.Engines
                     }
                 }
             }
-            //
+
             // the following "Programs.*" parameters are deprecated, just left for compatibility with HG < r340
             // Also the target SourceModule.Automation is deprecated and left for compatibility with HG < 499
-            //
             ModuleParameter parameter = null;
             if (c.Domain == Domains.HomeAutomation_HomeGenie && (c.Target == SourceModule.Scheduler || c.Target == SourceModule.Automation))
             {
@@ -311,7 +320,8 @@ namespace HomeGenie.Automation.Engines
                 case "Scheduler.DateTime":
                     parameter.Value = DateTime.Now.ToString("YY-MM-dd HH:mm:ss");
                     break;
-                //default:
+
+                // default:
                 //    Module module = homegenie.Modules.Find(m => m.Address == c.Target && m.Domain == c.Domain);
                 //    if (module != null)
                 //        parameter = module.Properties.Find(mp => mp.Name == c.Property);
@@ -322,17 +332,17 @@ namespace HomeGenie.Automation.Engines
             {
                 Module module = Homegenie.Modules.Find(m => m.Address == c.Target && m.Domain == c.Domain);
                 if (module != null)
+                {
                     parameter = module.Properties.Find(mp => mp.Name == c.Property);
+                }
             }
 
             if (parameter != null)
             {
                 IComparable lvalue = parameter.Value;
                 IComparable rvalue = comparisonValue;
-                //
                 double dval = 0;
                 DateTime dtval = new DateTime();
-                //
                 if (double.TryParse(parameter.Value.Replace(",", "."), NumberStyles.Float | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out dval))
                 {
                     lvalue = dval;
@@ -343,7 +353,7 @@ namespace HomeGenie.Automation.Engines
                     lvalue = dtval;
                     rvalue = DateTime.Parse(comparisonValue);
                 }
-                //
+
                 int comparisonresult = lvalue.CompareTo(rvalue);
                 if (c.ComparisonOperator == ComparisonOperator.LessThan && comparisonresult < 0)
                 {
@@ -358,6 +368,7 @@ namespace HomeGenie.Automation.Engines
                     returnValue = true;
                 }
             }
+
             return returnValue;
         }
 
@@ -369,4 +380,3 @@ namespace HomeGenie.Automation.Engines
         }
     }
 }
-

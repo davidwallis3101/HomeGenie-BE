@@ -1,21 +1,40 @@
-//Copyright (c) Microsoft Corporation.  All rights reserved.
-using System;
-using System.Text;
+// <copyright file="Encryption.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
+//
+// Portions  Copyright (c) Microsoft Corporation.  All rights reserved.
 
 namespace MIG.Utility.Encryption
 {
+    using System;
+    using System.Text;
+
     public class SHA1
     {
-
         public static string GenerateHashString(string s)
         {
             System.Security.Cryptography.SHA1 sha1enc = System.Security.Cryptography.SHA1.Create();
             byte[] wordbytes = System.Text.Encoding.UTF8.GetBytes(s);
             sha1enc.ComputeHash(wordbytes);
-            string hash = BitConverter.ToString(sha1enc.Hash).Replace("-", "");
+            string hash = BitConverter.ToString(sha1enc.Hash).Replace("-", string.Empty);
             return hash;
         }
-
     }
 
     // **************************************************************
@@ -26,7 +45,7 @@ namespace MIG.Utility.Encryption
     // * Copyright (c) Microsoft Corporation.  All rights reserved.
     // **************************************************************
 
-    // Simple struct for the (a,b,c,d) which is used to compute the mesage digest.    
+    // Simple struct for the (a,b,c,d) which is used to compute the mesage digest.
     struct ABCDStruct
     {
         public uint A;
@@ -37,15 +56,22 @@ namespace MIG.Utility.Encryption
 
     public sealed class MD5Core
     {
-        //Prevent CSC from adding a default public constructor
-        private MD5Core() { }
+        // Prevent CSC from adding a default public constructor
+        private MD5Core()
+        {
+        }
 
         public static byte[] GetHash(string input, Encoding encoding)
         {
             if (null == input)
+            {
                 throw new System.ArgumentNullException("input", "Unable to calculate hash over null input data");
+            }
+
             if (null == encoding)
+            {
                 throw new System.ArgumentNullException("encoding", "Unable to calculate hash over a string without a default encoding. Consider using the GetHash(string) overload to use UTF8 Encoding");
+            }
 
             byte[] target = encoding.GetBytes(input);
 
@@ -60,10 +86,12 @@ namespace MIG.Utility.Encryption
         public static string GetHashString(byte[] input)
         {
             if (null == input)
+            {
                 throw new System.ArgumentNullException("input", "Unable to calculate hash over null input data");
+            }
 
             string retval = BitConverter.ToString(GetHash(input));
-            retval = retval.Replace("-", "");
+            retval = retval.Replace("-", string.Empty);
 
             return retval;
         }
@@ -71,9 +99,14 @@ namespace MIG.Utility.Encryption
         public static string GetHashString(string input, Encoding encoding)
         {
             if (null == input)
+            {
                 throw new System.ArgumentNullException("input", "Unable to calculate hash over null input data");
+            }
+
             if (null == encoding)
+            {
                 throw new System.ArgumentNullException("encoding", "Unable to calculate hash over a string without a default encoding. Consider using the GetHashString(string) overload to use UTF8 Encoding");
+            }
 
             byte[] target = encoding.GetBytes(input);
 
@@ -88,51 +121,57 @@ namespace MIG.Utility.Encryption
         public static byte[] GetHash(byte[] input)
         {
             if (null == input)
+            {
                 throw new System.ArgumentNullException("input", "Unable to calculate hash over null input data");
+            }
 
-            //Intitial values defined in RFC 1321
+            // Intitial values defined in RFC 1321
             ABCDStruct abcd = new ABCDStruct();
             abcd.A = 0x67452301;
             abcd.B = 0xefcdab89;
             abcd.C = 0x98badcfe;
             abcd.D = 0x10325476;
 
-            //We pass in the input array by block, the final block of data must be handled specialy for padding & length embeding
+            // We pass in the input array by block, the final block of data must be handled specialy for padding & length embeding
             int startIndex = 0;
             while (startIndex <= input.Length - 64)
             {
                 MD5Core.GetHashBlock(input, ref abcd, startIndex);
                 startIndex += 64;
             }
-            // The final data block. 
-            return MD5Core.GetHashFinalBlock(input, startIndex, input.Length - startIndex, abcd, (Int64)input.Length * 8);
+
+            // The final data block.
+            return MD5Core.GetHashFinalBlock(input, startIndex, input.Length - startIndex, abcd, (long)input.Length * 8);
         }
 
-        internal static byte[] GetHashFinalBlock(byte[] input, int ibStart, int cbSize, ABCDStruct ABCD, Int64 len)
+        internal static byte[] GetHashFinalBlock(byte[] input, int ibStart, int cbSize, ABCDStruct ABCD, long len)
         {
             byte[] working = new byte[64];
             byte[] length = BitConverter.GetBytes(len);
 
-            //Padding is a single bit 1, followed by the number of 0s required to make size congruent to 448 modulo 512. Step 1 of RFC 1321  
-            //The CLR ensures that our buffer is 0-assigned, we don't need to explicitly set it. This is why it ends up being quicker to just
-            //use a temporary array rather then doing in-place assignment (5% for small inputs)
+            // Padding is a single bit 1, followed by the number of 0s required to make size congruent to 448 modulo 512. Step 1 of RFC 1321
+            // The CLR ensures that our buffer is 0-assigned, we don't need to explicitly set it. This is why it ends up being quicker to just
+            // use a temporary array rather then doing in-place assignment (5% for small inputs)
             Array.Copy(input, ibStart, working, 0, cbSize);
             working[cbSize] = 0x80;
 
-            //We have enough room to store the length in this chunk
+            // We have enough room to store the length in this chunk
             if (cbSize < 56)
             {
                 Array.Copy(length, 0, working, 56, 8);
                 GetHashBlock(working, ref ABCD, 0);
             }
-            else  //We need an aditional chunk to store the length
+            else
             {
+                // We need an aditional chunk to store the length
                 GetHashBlock(working, ref ABCD, 0);
-                //Create an entirely new chunk due to the 0-assigned trick mentioned above, to avoid an extra function call clearing the array
+
+                // Create an entirely new chunk due to the 0-assigned trick mentioned above, to avoid an extra function call clearing the array
                 working = new byte[64];
                 Array.Copy(length, 0, working, 56, 8);
                 GetHashBlock(working, ref ABCD, 0);
             }
+
             byte[] output = new byte[16];
             Array.Copy(BitConverter.GetBytes(ABCD.A), 0, output, 0, 4);
             Array.Copy(BitConverter.GetBytes(ABCD.B), 0, output, 4, 4);
@@ -231,48 +270,50 @@ namespace MIG.Utility.Encryption
             return;
         }
 
-        //Manually unrolling these equations nets us a 20% performance improvement
+        // Manually unrolling these equations nets us a 20% performance improvement
         private static uint r1(uint a, uint b, uint c, uint d, uint x, int s, uint t)
         {
-            //                  (b + LSR((a + F(b, c, d) + x + t), s))
-            //F(x, y, z)        ((x & y) | ((x ^ 0xFFFFFFFF) & z))
-            return unchecked(b + LSR((a + ((b & c) | ((b ^ 0xFFFFFFFF) & d)) + x + t), s));
+            // (b + LSR((a + F(b, c, d) + x + t), s))
+            // F(x, y, z)        ((x & y) | ((x ^ 0xFFFFFFFF) & z))
+            return unchecked(b + LSR(a + ((b & c) | ((b ^ 0xFFFFFFFF) & d)) + x + t, s));
         }
 
         private static uint r2(uint a, uint b, uint c, uint d, uint x, int s, uint t)
         {
-            //                  (b + LSR((a + G(b, c, d) + x + t), s))
-            //G(x, y, z)        ((x & z) | (y & (z ^ 0xFFFFFFFF)))
-            return unchecked(b + LSR((a + ((b & d) | (c & (d ^ 0xFFFFFFFF))) + x + t), s));
+            // (b + LSR((a + G(b, c, d) + x + t), s))
+            // G(x, y, z)        ((x & z) | (y & (z ^ 0xFFFFFFFF)))
+            return unchecked(b + LSR(a + ((b & d) | (c & (d ^ 0xFFFFFFFF))) + x + t, s));
         }
 
         private static uint r3(uint a, uint b, uint c, uint d, uint x, int s, uint t)
         {
-            //                  (b + LSR((a + H(b, c, d) + k + i), s))
-            //H(x, y, z)        (x ^ y ^ z)
-            return unchecked(b + LSR((a + (b ^ c ^ d) + x + t), s));
+            // (b + LSR((a + H(b, c, d) + k + i), s))
+            // H(x, y, z)        (x ^ y ^ z)
+            return unchecked(b + LSR(a + (b ^ c ^ d) + x + t, s));
         }
 
         private static uint r4(uint a, uint b, uint c, uint d, uint x, int s, uint t)
         {
-            //                  (b + LSR((a + I(b, c, d) + k + i), s))
-            //I(x, y, z)        (y ^ (x | (z ^ 0xFFFFFFFF)))
-            return unchecked(b + LSR((a + (c ^ (b | (d ^ 0xFFFFFFFF))) + x + t), s));
+            // (b + LSR((a + I(b, c, d) + k + i), s))
+            // I(x, y, z)        (y ^ (x | (z ^ 0xFFFFFFFF)))
+            return unchecked(b + LSR(a + (c ^ (b | (d ^ 0xFFFFFFFF))) + x + t, s));
         }
 
         // Implementation of left rotate
-        // s is an int instead of a uint becuase the CLR requires the argument passed to >>/<< is of 
+        // s is an int instead of a uint becuase the CLR requires the argument passed to >>/<< is of
         // type int. Doing the demoting inside this function would add overhead.
         private static uint LSR(uint i, int s)
         {
-            return ((i << s) | (i >> (32 - s)));
+            return (i << s) | (i >> (32 - s));
         }
 
-        //Convert input array into array of UInts
+        // Convert input array into array of UInts
         private static uint[] Converter(byte[] input, int ibStart)
         {
             if (null == input)
+            {
                 throw new System.ArgumentNullException("input", "Unable convert null array to array of uInts");
+            }
 
             uint[] result = new uint[16];
 

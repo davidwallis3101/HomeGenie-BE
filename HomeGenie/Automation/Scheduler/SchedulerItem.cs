@@ -1,37 +1,35 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using System.Xml.Serialization;
-using HomeGenie.Data;
+﻿// <copyright file="SchedulerItem.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scheduler
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+    using HomeGenie.Data;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Scheduler item.
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class SchedulerItem
     {
         /// <summary>
@@ -82,23 +80,25 @@ namespace HomeGenie.Automation.Scheduler
         /// <value>The bound modules.</value>
         public List<ModuleReference> BoundModules { get; set; }
 
-        [XmlIgnore,JsonIgnore]
+        [XmlIgnore]
+        [JsonIgnore]
         public string LastOccurrence { get; set; }
 
         // TODO: deprecate this field - left for compatibility with hg <= r521
         [Obsolete("deprecate this field - left for compatibility with hg <= r521")]
         public string ProgramId { get; set; }
 
-        [XmlIgnore,JsonIgnore]
+        [XmlIgnore]
+        [JsonIgnore]
         public SchedulerScriptingEngine ScriptEngine { get; set; }
 
         public SchedulerItem()
         {
-            Name = "";
-            CronExpression = "";
-            ProgramId = "";
+            Name = string.Empty;
+            CronExpression = string.Empty;
+            ProgramId = string.Empty;
             IsEnabled = false;
-            LastOccurrence = "";
+            LastOccurrence = string.Empty;
             BoundDevices = new List<string>();
             BoundModules = new List<ModuleReference>();
         }

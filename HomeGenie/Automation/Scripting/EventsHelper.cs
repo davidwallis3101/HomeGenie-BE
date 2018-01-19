@@ -1,35 +1,29 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using HomeGenie.Data;
-using HomeGenie.Service;
+﻿// <copyright file="EventsHelper.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Scripting
 {
+    using System;
+    using HomeGenie.Data;
+    using HomeGenie.Service;
+
     /// <summary>
     /// Events Helper class.\n
     /// Class instance accessor: **When**
@@ -60,7 +54,7 @@ namespace HomeGenie.Automation.Scripting
         ///         Program.Say("HomeGenie is now ready!");
         ///         // returning false will prevent this event from being routed to other listeners
         ///         return false;
-        ///     }); 
+        ///     });
         /// </code></example>
         public EventsHelper SystemStarted(Func<bool> handler)
         {
@@ -68,7 +62,7 @@ namespace HomeGenie.Automation.Scripting
             program.Engine.SystemStarted = handler;
             return this;
         }
-        
+
         /// <summary>
         /// Call the specified <handler> when HomeGenie service is stopping.
         /// </summary>
@@ -83,7 +77,7 @@ namespace HomeGenie.Automation.Scripting
         ///         Program.Say("See ya soon!");
         ///         // returning true will route this event to other listeners
         ///         return true;
-        ///     }); 
+        ///     });
         /// </code></example>
         public EventsHelper SystemStopping(Func<bool> handler)
         {
@@ -91,7 +85,7 @@ namespace HomeGenie.Automation.Scripting
             program.Engine.SystemStopping = handler;
             return this;
         }
-        
+
         /// <summary>
         /// Call the specified <handler> when the program is beign stopped.
         /// </summary>
@@ -106,7 +100,7 @@ namespace HomeGenie.Automation.Scripting
         ///         Program.Say("Oh-oh! I'm quitting!");
         ///         // returning true will route this event to other listeners
         ///         return true;
-        ///     }); 
+        ///     });
         /// </code></example>
         public EventsHelper ProgramStopping(Func<bool> handler)
         {
@@ -133,7 +127,7 @@ namespace HomeGenie.Automation.Scripting
         ///             return false;
         ///         }
         ///         return true;
-        ///     }); 
+        ///     });
         /// </code></example>
         /// <seealso cref="ModuleParameterIsChanging"/>
         public EventsHelper ModuleParameterChanged(Func<ModuleHelper, ModuleParameter, bool> handler)
@@ -144,7 +138,7 @@ namespace HomeGenie.Automation.Scripting
         }
 
         /// <summary>
-        /// Call the specified <handler> function when a parameter of a module is changing. 
+        /// Call the specified <handler> function when a parameter of a module is changing.
         /// If either the <handler> returns false or changes the event value, the propagation will stop.
         /// </summary>
         /// <returns>EventsHelper</returns>
@@ -163,7 +157,7 @@ namespace HomeGenie.Automation.Scripting
         ///         }
         ///         // continue event propagation
         ///         return true;
-        ///     }); 
+        ///     });
         /// </code></example>
         /// <seealso cref="ModuleParameterChanged"/>
         public EventsHelper ModuleParameterIsChanging(Func<ModuleHelper, ModuleParameter, bool> handler)
@@ -192,7 +186,7 @@ namespace HomeGenie.Automation.Scripting
         ///             returnstring = "Hello HomeGenie World!";
         ///         }
         ///         return returnstring;
-        ///     }); 
+        ///     });
         /// </code>
         /// In the snippet above, if we wanted to create an "Hello World" program that respond to the custom API call:
         /// \n
@@ -212,13 +206,11 @@ namespace HomeGenie.Automation.Scripting
             return this;
         }
 
-
-        //TODO: deprecate this
+        // TODO: deprecate this
         [Obsolete("use 'ModuleParameterChanged' instead")]
         public EventsHelper ModuleParameterChange(Func<ModuleHelper, ModuleParameter, bool> handler)
         {
             return ModuleParameterChanged(handler);
         }
-
     }
 }

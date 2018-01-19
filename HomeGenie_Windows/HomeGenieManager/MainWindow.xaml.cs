@@ -1,58 +1,39 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-
-using WinForms = System.Windows.Forms;
-using System.Threading;
-
-using System.ServiceProcess;
-using System.ComponentModel;
-using System.ServiceModel;
-using System.Configuration;
-
-using OpenSource.UPnP;
-
+﻿// <copyright file="MainWindow.xaml.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenieManager
 {
+    using System;
+    using System.Linq;
+    using System.ServiceModel;
+    using System.ServiceProcess;
+    using System.Threading;
+    using System.Windows;
+    using System.Windows.Controls;
+    using WinForms = System.Windows.Forms;
+
     /// <summary>
     /// Logica di interazione per MainWindow.xaml
     /// </summary>
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Single)]
-    public partial class MainWindow : Window//, IManagerCallback
+    public partial class MainWindow : Window// , IManagerCallback
     {
         private WinForms.NotifyIcon notifierIcon = new WinForms.NotifyIcon();
         private ServiceController serviceController = null;
@@ -66,7 +47,6 @@ namespace HomeGenieManager
         public MainWindow()
         {
             InitializeComponent();
-            //
             Initialize();
         }
 
@@ -75,26 +55,21 @@ namespace HomeGenieManager
             this.Visibility = System.Windows.Visibility.Hidden;
             this.Left = System.Windows.SystemParameters.PrimaryScreenWidth - this.Width;
             this.Top = System.Windows.SystemParameters.PrimaryScreenHeight - 30 - this.Height;
-            //
             serviceController = new ServiceController();
             notifierIcon.MouseDown += new WinForms.MouseEventHandler(_notifier_MouseDown);
             notifierIcon.Icon = HomeGenieManager.Properties.Resources.TrayIcon;
             notifierIcon.Visible = true;
             notifierIcon.Text = "HomeGenie Automation Server";
-            //
             var menu = (ContextMenu)this.FindResource("NotifierContextMenu");
             startStopItem = (MenuItem)menu.Items[4];
-            //
             serviceController.ServiceName = "HomeGenieService";
             var serviceChecker = new Thread(checkServiceStatus);
             serviceChecker.Start();
-            //
             instanceContext = new InstanceContext(this);
         }
 
         private void checkServiceStatus()
         {
-            //
             while (isAppRunning)
             {
                 string status = "HomeGenie Service not installed on local host.";
@@ -116,7 +91,7 @@ namespace HomeGenieManager
                         {
                             this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new ThreadStart(() =>
                             {
-                                //_startstopitem.Header = "Start Service";
+                                // _startstopitem.Header = "Start Service";
                                 startStopItem.IsEnabled = false;
                             }));
                         }
@@ -130,18 +105,21 @@ namespace HomeGenieManager
                         }));
                     }
                 }
-                catch { }
+                catch
+                {
+                }
+
                 if (notifierIcon.Text != status)
                 {
                     notifierIcon.BalloonTipTitle = "HomeGenie Message";
                     notifierIcon.BalloonTipText = status;
                     notifierIcon.ShowBalloonTip(1000);
                 }
+
                 notifierIcon.Text = status;
                 Thread.Sleep(5000);
             }
         }
-
 
         private void _notifier_MouseDown(object sender, WinForms.MouseEventArgs e)
         {
@@ -151,7 +129,6 @@ namespace HomeGenieManager
                 menu.IsOpen = true;
             }
         }
-
 
         private void MenuStartStopService_Click(object sender, RoutedEventArgs e)
         {
@@ -202,6 +179,5 @@ namespace HomeGenieManager
             isAppRunning = false;
             Application.Current.Shutdown();
         }
-
     }
 }

@@ -1,38 +1,36 @@
-/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
-*     Author: Generoso Martello <gene@homegenie.it>
-*     Project Homepage: http://github.com/Bounz/HomeGenie-BE
-*/
-
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.IO;
-using HomeGenie.Data;
-using HomeGenie.Service;
-using MIG;
-using HomeGenie.Service.Constants;
-using HomeGenie.Automation.Scheduler;
-using System.Linq;
+// <copyright file="ProgramManager.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using HomeGenie.Automation.Scheduler;
+    using HomeGenie.Data;
+    using HomeGenie.Service;
+    using HomeGenie.Service.Constants;
+    using MIG;
+
     public class ProgramManager
     {
         private readonly TsList<ProgramBlock> automationPrograms = new TsList<ProgramBlock>();
@@ -40,7 +38,7 @@ namespace HomeGenie.Automation
         private readonly SchedulerService schedulerService;
         private readonly MacroRecorder macroRecorder;
 
-        //private object lockObject = new object();
+        // private object lockObject = new object();
         private bool isEngineEnabled;
 
         public const int USERSPACE_PROGRAMS_START = 1000;
@@ -62,8 +60,12 @@ namespace HomeGenie.Automation
 
         public bool Enabled
         {
-            get { return isEngineEnabled; }
-            set 
+            get
+            {
+                return isEngineEnabled;
+            }
+
+            set
             {
                 bool wasEnabled = isEngineEnabled;
                 isEngineEnabled = value;
@@ -81,7 +83,9 @@ namespace HomeGenie.Automation
                     foreach (ProgramBlock program in automationPrograms)
                     {
                         if (program.IsEnabled)
+                        {
                             program.Engine.StartScheduler();
+                        }
                     }
                 }
             }
@@ -124,10 +128,15 @@ namespace HomeGenie.Automation
             foreach (ProgramBlock program in userPrograms)
             {
                 if (pid == program.Address)
+                {
                     pid = program.Address + 1;
+                }
                 else
+                {
                     break;
+                }
             }
+
             // TODO: it should return -1 if all user programs are already allocated
             return pid;
         }
@@ -154,8 +163,10 @@ namespace HomeGenie.Automation
             RaiseProgramModuleEvent(program, Properties.ProgramStatus, "Removed");
             program.IsEnabled = false;
             automationPrograms.Remove(program);
+
             // delete program files
             string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "programs");
+
             // remove csharp assembly
             try
             {
@@ -164,11 +175,15 @@ namespace HomeGenie.Automation
             catch
             {
             }
-            // remove arduino folder files 
+
+            // remove arduino folder files
             try
             {
                 Directory.Delete(Path.Combine(file, "arduino", program.Address.ToString()), true);
-            } catch { }
+            }
+            catch
+            {
+            }
         }
 
         internal void RaiseProgramModuleEvent(ProgramBlock program, string property, string value)
@@ -178,18 +193,18 @@ namespace HomeGenie.Automation
             {
                 Utility.ModuleParameterSet(programModule, property, value);
                 hgService.RaiseEvent(program.Address, programModule.Domain, programModule.Address, "Automation Program", property, value);
-                //homegenie.MigService.RaiseEvent(actionEvent);
-                //homegenie.SignalModulePropertyChange(this, programModule, actionEvent);
+
+                // homegenie.MigService.RaiseEvent(actionEvent);
+                // homegenie.SignalModulePropertyChange(this, programModule, actionEvent);
             }
         }
-
-        #region Module/Interface Events handling and propagation
 
         public void SignalPropertyChange(object sender, Module module, MigEvent eventData)
         {
             ModuleParameter parameter = Utility.ModuleParameterGet(module, eventData.Property);
 
-            var routedEvent = new RoutedEvent() {
+            var routedEvent = new RoutedEvent()
+            {
                 Sender = sender,
                 Module = module,
                 Parameter = parameter
@@ -200,6 +215,7 @@ namespace HomeGenie.Automation
             {
                 // Route event to Programs->ModuleChangedHandler
                 ThreadPool.QueueUserWorkItem(new WaitCallback(RoutePropertyChangedEvent), routedEvent);
+
                 // Route event to SchedulerService->OnModuleUpdate
                 ThreadPool.QueueUserWorkItem(new WaitCallback(schedulerService.OnModuleUpdate), routedEvent);
             }
@@ -213,8 +229,12 @@ namespace HomeGenie.Automation
             for (int p = 0; p < Programs.Count; p++)
             {
                 var program = Programs[p];
-                if (!program.IsEnabled) continue;
-                if ((moduleEvent.Sender == null || !moduleEvent.Sender.Equals(program.Address)))
+                if (!program.IsEnabled)
+                {
+                    continue;
+                }
+
+                if (moduleEvent.Sender == null || !moduleEvent.Sender.Equals(program.Address))
                 {
                     if (program.Engine.ModuleIsChangingHandler != null)
                     {
@@ -225,7 +245,7 @@ namespace HomeGenie.Automation
                             MigService.Log.Debug("Event propagation halted by automation program '{0}' ({1}) (Name={2}, OldValue={3}, NewValue={4})", program.Name, program.Address, moduleEvent.Parameter.Name, originalValue, moduleEvent.Parameter.Value);
                             return false;
                         }
-                        else  if (moduleEvent.Parameter.Value != originalValue)
+                        else if (moduleEvent.Parameter.Value != originalValue)
                         {
                             // If manipulated, the event is not routed anymore.
                             MigService.Log.Debug("Event propagation halted - parameter manipulated by automation program '{0}' ({1}) (Name={2}, OldValue={3}, NewValue={4})", program.Name, program.Address, moduleEvent.Parameter.Name, originalValue, moduleEvent.Parameter.Value);
@@ -234,6 +254,7 @@ namespace HomeGenie.Automation
                     }
                 }
             }
+
             return true;
         }
 
@@ -245,13 +266,17 @@ namespace HomeGenie.Automation
             for (int p = 0; p < Programs.Count; p++)
             {
                 var program = Programs[p];
-                if (program == null || !program.IsEnabled || !isEngineEnabled) continue;
-                if ((moduleEvent.Sender == null || !moduleEvent.Sender.Equals(program)))
+                if (program == null || !program.IsEnabled || !isEngineEnabled)
+                {
+                    continue;
+                }
+
+                if (moduleEvent.Sender == null || !moduleEvent.Sender.Equals(program))
                 {
                     try
                     {
                         program.Engine.RoutedEventAck.Set();
-                        if (program.Engine.ModuleChangedHandler != null && moduleEvent.Parameter != null) // && proceed)
+                        if (program.Engine.ModuleChangedHandler != null && moduleEvent.Parameter != null)
                         {
                             bool handled = !program.Engine.ModuleChangedHandler(moduleHelper, moduleEvent.Parameter);
                             if (handled)
@@ -275,21 +300,18 @@ namespace HomeGenie.Automation
                             program.Address.ToString(),
                             ex.Message,
                             "Exception.StackTrace",
-                            ex.StackTrace
-                        );
+                            ex.StackTrace);
                     }
                 }
             }
         }
-
-        #endregion
 
         private void program_EnabledStateChanged(object sender, bool isEnabled)
         {
             ProgramBlock program = (ProgramBlock)sender;
             if (isEnabled)
             {
-                program.ScriptErrors = "";
+                program.ScriptErrors = string.Empty;
                 hgService.modules_RefreshPrograms();
                 hgService.modules_RefreshVirtualModules();
                 RaiseProgramModuleEvent(program, Properties.ProgramStatus, "Enabled");
@@ -302,6 +324,7 @@ namespace HomeGenie.Automation
                 hgService.modules_RefreshPrograms();
                 hgService.modules_RefreshVirtualModules();
             }
+
             hgService.modules_Sort();
         }
     }

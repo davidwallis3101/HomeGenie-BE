@@ -1,50 +1,35 @@
-﻿/*
-    This file is part of MIG Project source code.
-
-    MIG is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    MIG is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with MIG.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: https://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Xml;
-using System.Xml.Serialization;
-
-using LibUsbDotNet;
-using LibUsbDotNet.LibUsb;
-using LibUsbDotNet.Main;
-
-using MIG.Interfaces.HomeAutomation.Commons;
-using MIG.Config;
-using XTenLib;
+﻿// <copyright file="X10.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace MIG.Interfaces.HomeAutomation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading;
+    using MIG.Config;
+    using MIG.Interfaces.HomeAutomation.Commons;
+    using XTenLib;
+
     public class X10 : MigInterface
     {
-
-        #region MigInterface API commands
-
         public enum Commands
         {
             NotSet,
@@ -61,44 +46,45 @@ namespace MIG.Interfaces.HomeAutomation
             Control_AllLightsOff
         }
 
-        #endregion
-
-        #region Private fields
-
         private XTenManager x10lib;
         private Timer rfPulseTimer;
         private List<InterfaceModule> securityModules;
         private List<Option> options;
 
-        #endregion
-
-        #region MIG Interface members
-
         public event InterfaceModulesChangedEventHandler InterfaceModulesChanged;
+
         public event InterfacePropertyChangedEventHandler InterfacePropertyChanged;
 
         public bool IsEnabled { get; set; }
 
         public List<Option> Options
-        { 
+        {
             get
             {
                 return options;
             }
+
             set
             {
                 options = value;
                 if (this.GetOption("Port") != null)
+                {
                     x10lib.PortName = this.GetOption("Port").Value.Replace("|", "/");
+                }
+
                 if (this.GetOption("HouseCodes") != null)
+                {
                     x10lib.HouseCode = this.GetOption("HouseCodes").Value;
+                }
             }
         }
 
         public void OnSetOption(Option option)
         {
             if (IsEnabled)
+            {
                 Connect();
+            }
         }
 
         public List<InterfaceModule> GetModules()
@@ -106,7 +92,6 @@ namespace MIG.Interfaces.HomeAutomation
             List<InterfaceModule> modules = new List<InterfaceModule>();
             if (x10lib != null)
             {
-
                 InterfaceModule module = new InterfaceModule();
 
                 // CM-15 RF receiver
@@ -121,20 +106,18 @@ namespace MIG.Interfaces.HomeAutomation
                 // Standard X10 modules
                 foreach (var kv in x10lib.Modules)
                 {
-
                     module = new InterfaceModule();
                     module.Domain = this.GetDomain();
                     module.Address = kv.Value.Code;
                     module.ModuleType = ModuleTypes.Switch;
                     module.Description = "X10 Module";
                     modules.Add(module);
-
                 }
 
                 // CM-15 RF Security modules
                 modules.AddRange(securityModules);
-
             }
+
             return modules;
         }
 
@@ -158,19 +141,19 @@ namespace MIG.Interfaces.HomeAutomation
 
         public bool IsDevicePresent()
         {
-            //bool present = false;
+            // bool present = false;
             ////
             ////TODO: implement serial port scanning for CM11 as well
-            //foreach (UsbRegistry usbdev in LibUsbDevice.AllDevices)
-            //{
+            // foreach (UsbRegistry usbdev in LibUsbDevice.AllDevices)
+            // {
             //    //Console.WriteLine(o.Vid + " " + o.SymbolicName + " " + o.Pid + " " + o.Rev + " " + o.FullName + " " + o.Name + " ");
             //    if ((usbdev.Vid == 0x0BC7 && usbdev.Pid == 0x0001) || usbdev.FullName.ToUpper().Contains("X10"))
             //    {
             //        present = true;
             //        break;
             //    }
-            //}
-            //return present;
+            // }
+            // return present;
             return true;
         }
 
@@ -207,10 +190,10 @@ namespace MIG.Interfaces.HomeAutomation
                 break;
             case Commands.Control_Level_Adjust:
                 int adjvalue = int.Parse(option);
-                //x10lib.Modules[nodeId].Level = ((double)adjvalue/100D);
+
+                // x10lib.Modules[nodeId].Level = ((double)adjvalue/100D);
                 OnInterfacePropertyChanged(this.GetDomain(), nodeId, "X10 Module", ModuleEvents.Status_Level, x10lib.Modules[nodeId].Level);
-                throw(new NotImplementedException("X10 CONTROL_LEVEL_ADJUST Not Implemented"));
-                break;
+                throw new NotImplementedException("X10 CONTROL_LEVEL_ADJUST Not Implemented");
             case Commands.Control_Level:
                 int dimvalue = int.Parse(option) - (int)(x10lib.Modules[nodeId].Level * 100.0);
                 if (dimvalue > 0)
@@ -221,6 +204,7 @@ namespace MIG.Interfaces.HomeAutomation
                 {
                     x10lib.Dim(houseCode, unitCode, -dimvalue);
                 }
+
                 break;
             case Commands.Control_Toggle:
                 string huc = XTenLib.Utility.HouseUnitCodeFromEnum(houseCode, unitCode);
@@ -232,6 +216,7 @@ namespace MIG.Interfaces.HomeAutomation
                 {
                     x10lib.UnitOff(houseCode, unitCode);
                 }
+
                 break;
             case Commands.Control_AllLightsOn:
                 x10lib.AllLightsOn(houseCode);
@@ -244,19 +229,17 @@ namespace MIG.Interfaces.HomeAutomation
             return response;
         }
 
-        #endregion
-
-        #region Lifecycle
-
         public X10()
         {
             string assemblyFolder = MigService.GetAssemblyDirectory(this.GetType().Assembly);
             var libusblink = Path.Combine(assemblyFolder, "libusb-1.0.so");
+
             // RaspBerry Pi armel dependency check and needed symlink
             if ((File.Exists("/lib/arm-linux-gnueabi/libusb-1.0.so.0.1.0") || File.Exists("/lib/arm-linux-gnueabihf/libusb-1.0.so.0.1.0")) && !File.Exists(libusblink))
             {
                 MigService.ShellCommand("ln", " -s \"/lib/arm-linux-gnueabi/libusb-1.0.so.0.1.0\" \"" + libusblink + "\"");
             }
+
             // Debian/Ubuntu 64bit dependency and needed symlink check
             if (File.Exists("/lib/x86_64-linux-gnu/libusb-1.0.so.0") && !File.Exists(libusblink))
             {
@@ -269,12 +252,6 @@ namespace MIG.Interfaces.HomeAutomation
             x10lib.RfSecurityReceived += X10lib_RfSecurityReceived;
             securityModules = new List<InterfaceModule>();
         }
-
-        #endregion
-
-        #region Private fields
-
-        #region XTenLib events
 
         private void X10lib_RfSecurityReceived(object sender, RfSecurityReceivedEventArgs args)
         {
@@ -299,6 +276,7 @@ namespace MIG.Interfaces.HomeAutomation
                 address = "S-REMOTE";
                 moduleType = ModuleTypes.Sensor;
             }
+
             var module = securityModules.Find(m => m.Address == address);
             if (module == null)
             {
@@ -312,6 +290,7 @@ namespace MIG.Interfaces.HomeAutomation
                 OnInterfacePropertyChanged(this.GetDomain(), "RF", "X10 RF Receiver", ModuleEvents.Receiver_Status, "Added security module " + address);
                 OnInterfaceModulesChanged(this.GetDomain());
             }
+
             switch (args.Event)
             {
             case X10RfSecurityEvent.DoorSensor1_Alert:
@@ -371,21 +350,20 @@ namespace MIG.Interfaces.HomeAutomation
             {
                 rfPulseTimer = new Timer(delegate(object target)
                 {
-                    OnInterfacePropertyChanged(this.GetDomain(), "RF", "X10 RF Receiver", ModuleEvents.Receiver_RawData, "");
+                    OnInterfacePropertyChanged(this.GetDomain(), "RF", "X10 RF Receiver", ModuleEvents.Receiver_RawData, string.Empty);
                 });
             }
+
             rfPulseTimer.Change(1000, Timeout.Infinite);
         }
 
         private void X10lib_ModuleChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "Level")
+            {
                 OnInterfacePropertyChanged(this.GetDomain(), (sender as X10Module).Code, (sender as X10Module).Description, ModuleEvents.Status_Level, (sender as X10Module).Level.ToString());
+            }
         }
-
-        #endregion
-
-        #region Events
 
         protected virtual void OnInterfaceModulesChanged(string domain)
         {
@@ -404,10 +382,5 @@ namespace MIG.Interfaces.HomeAutomation
                 InterfacePropertyChanged(this, args);
             }
         }
-
-        #endregion
-
-        #endregion
-
     }
 }

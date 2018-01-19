@@ -1,56 +1,48 @@
-/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Globalization;
-
-using Newtonsoft.Json;
-using System.Xml.Serialization;
-using HomeGenie.Service;
-using HomeGenie.Service.Logging;
-using System.Threading;
+// <copyright file="ModuleParameter.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Data
 {
+    using System;
+    using System.Globalization;
+    using System.Threading;
+    using System.Xml.Serialization;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Module parameter.
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class ModuleParameter
     {
-        [NonSerialized]
-        private ValueStatistics statistics;
-        [NonSerialized]
-        private DateTime requestUpdateTimestamp = DateTime.UtcNow;
+        [NonSerialized] private ValueStatistics statistics;
+        [NonSerialized] private DateTime requestUpdateTimestamp = DateTime.UtcNow;
         private string parameterValue;
-        //
+
         public ModuleParameter()
         {
-            // initialize 
-            Name = "";
-            Value = "";
-            Description = "";
-            FieldType = "";
+            // initialize
+            Name = string.Empty;
+            Value = string.Empty;
+            Description = string.Empty;
+            FieldType = string.Empty;
             UpdateTime = DateTime.UtcNow;
         }
 
@@ -58,12 +50,17 @@ namespace HomeGenie.Data
         /// Gets the statistics.
         /// </summary>
         /// <value>The statistics.</value>
-        [XmlIgnore, JsonIgnore]
+        [XmlIgnore]
+        [JsonIgnore]
         public ValueStatistics Statistics
         {
             get
             {
-                if (statistics == null) statistics = new ValueStatistics();
+                if (statistics == null)
+                {
+                    statistics = new ValueStatistics();
+                }
+
                 return statistics;
             }
         }
@@ -84,10 +81,12 @@ namespace HomeGenie.Data
             {
                 return parameterValue;
             }
+
             set
             {
                 UpdateTime = DateTime.UtcNow;
                 parameterValue = value;
+
                 // is this a numeric value that can be added for statistics?
                 double v;
                 if (!string.IsNullOrEmpty(value) && double.TryParse(value.Replace(",", "."), NumberStyles.Float | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out v))
@@ -122,14 +121,18 @@ namespace HomeGenie.Data
         /// Gets the decimal value.
         /// </summary>
         /// <value>The decimal value.</value>
-        [XmlIgnore, JsonIgnore]
+        [XmlIgnore]
+        [JsonIgnore]
         public double DecimalValue
         {
             get
             {
-
                 double v = 0;
-                if (this.Value != null && !double.TryParse(this.Value.Replace(",", "."), NumberStyles.Float | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out v)) v = 0;
+                if (this.Value != null && !double.TryParse(this.Value.Replace(",", "."), NumberStyles.Float | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out v))
+                {
+                    v = 0;
+                }
+
                 return v;
             }
         }
@@ -141,7 +144,7 @@ namespace HomeGenie.Data
         /// <param name="name">Name.</param>
         public bool Is(string name)
         {
-            return (this.Name.ToLower() == name.ToLower());
+            return this.Name.ToLower() == name.ToLower();
         }
 
         public void RequestUpdate()
@@ -158,7 +161,10 @@ namespace HomeGenie.Data
         {
             var lastUpdate = UpdateTime;
             while (lastUpdate.Ticks == UpdateTime.Ticks && (DateTime.UtcNow - requestUpdateTimestamp).TotalSeconds < timeoutSeconds)
+            {
                 Thread.Sleep(250);
+            }
+
             return lastUpdate.Ticks != UpdateTime.Ticks;
         }
 
@@ -166,16 +172,14 @@ namespace HomeGenie.Data
         /// Gets the idle time (time elapsed since last update).
         /// </summary>
         /// <value>The idle time.</value>
-        [XmlIgnore, JsonIgnore]
+        [XmlIgnore]
+        [JsonIgnore]
         public double IdleTime
         {
-            get 
+            get
             {
                 return (DateTime.UtcNow - UpdateTime).TotalSeconds;
             }
         }
-
     }
-
 }
-

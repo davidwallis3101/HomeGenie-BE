@@ -1,34 +1,30 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using MIG;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using HomeGenie.Service.Constants;
+﻿// <copyright file="MacroRecorder.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation
 {
+    using System;
+    using System.Collections.Generic;
+    using HomeGenie.Service.Constants;
+    using MIG;
+
     public enum MacroDelayType
     {
         None = -1,
@@ -44,8 +40,8 @@ namespace HomeGenie.Automation
         private DateTime currentTimestamp = DateTime.Now;
         private double delaySeconds = 1;
         private MacroDelayType delayType = MacroDelayType.Fixed;
-        //private DateTime startTimestamp = DateTime.Now;
 
+        // private DateTime startTimestamp = DateTime.Now;
         private ProgramManager masterControlProgram;
 
         public MacroRecorder(ProgramManager mcp)
@@ -63,14 +59,14 @@ namespace HomeGenie.Automation
         {
             // start recording
             macroCommands.Clear();
-            //startTimestamp = currentTimestamp = DateTime.Now;
+
+            // startTimestamp = currentTimestamp = DateTime.Now;
             isMacroRecordingEnabled = true;
         }
 
         public ProgramBlock SaveMacro(string options)
         {
             RecordingDisable();
-            //
             var program = new ProgramBlock();
             program.Name = "New Macro";
             program.Address = masterControlProgram.GeneratePid();
@@ -81,16 +77,17 @@ namespace HomeGenie.Automation
                 command.Domain = migCommand.Domain;
                 command.Target = migCommand.Address;
                 command.CommandString = migCommand.Command;
-                command.CommandArguments = "";
+                command.CommandArguments = string.Empty;
                 if (!string.IsNullOrEmpty(migCommand.GetOption(0)) && migCommand.GetOption(0) != "null")
                 {
-                    //TODO: should we pass entire command option string? migCmd.OptionsString
-                    command.CommandArguments = migCommand.GetOption(0) + (options != "" && options != "null" ? "/" + options : "");
+                    // TODO: should we pass entire command option string? migCmd.OptionsString
+                    command.CommandArguments = migCommand.GetOption(0) + (options != string.Empty && options != "null" ? "/" + options : string.Empty);
                 }
+
                 program.Commands.Add(command);
             }
+
             masterControlProgram.ProgramAdd(program);
-            //
             return program;
         }
 
@@ -109,7 +106,7 @@ namespace HomeGenie.Automation
                 delay = delaySeconds;
                 break;
             }
-            //
+
             try
             {
                 if (delay > 0 && macroCommands.Count > 0)
@@ -117,15 +114,15 @@ namespace HomeGenie.Automation
                     // add a pause command to the macro
                     macroCommands.Add(new MigInterfaceCommand(Domains.HomeAutomation_HomeGenie + "/Automation/Program.Pause/" + delay.ToString(System.Globalization.CultureInfo.InvariantCulture)));
                 }
+
                 macroCommands.Add(cmd);
             }
             catch
             {
-                //HomeGenieService.LogEvent(Domains.HomeAutomation_HomeGenie, "migservice_ServiceRequestPostProcess(...)", ex.Message, "Exception.StackTrace", ex.StackTrace);
+                // HomeGenieService.LogEvent(Domains.HomeAutomation_HomeGenie, "migservice_ServiceRequestPostProcess(...)", ex.Message, "Exception.StackTrace", ex.StackTrace);
             }
-            //
-            currentTimestamp = DateTime.Now;
 
+            currentTimestamp = DateTime.Now;
         }
 
         public bool IsRecordingEnabled
@@ -144,6 +141,5 @@ namespace HomeGenie.Automation
             get { return delaySeconds; }
             set { delaySeconds = value; }
         }
-
     }
 }

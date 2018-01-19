@@ -1,35 +1,33 @@
-﻿/*
-    This file is part of HomeGenie Project source code.
-
-    HomeGenie is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomeGenie is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://github.com/Bounz/HomeGenie-BE
- */
-
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.CSharp;
-using System.CodeDom.Compiler;
-using System.IO;
-using System.Linq;
+﻿// <copyright file="CSharpAppFactory.cs" company="Bounz">
+// This file is part of HomeGenie-BE Project source code.
+//
+// HomeGenie-BE is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// HomeGenie is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with HomeGenie-BE.  If not, see http://www.gnu.org/licenses.
+//
+//  Project Homepage: https://github.com/Bounz/HomeGenie-BE
+//
+//  Forked from Homegenie by Generoso Martello gene@homegenie.it
+// </copyright>
 
 namespace HomeGenie.Automation.Engines
 {
+    using System;
+    using System.CodeDom.Compiler;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using Microsoft.CSharp;
+
     public static class CSharpAppFactory
     {
         public const int ConditionCodeOffset = 8;
@@ -159,21 +157,24 @@ namespace HomeGenie.Automation.Scripting
                 .Replace("{statement}", scriptSource)
                 .Replace("{condition}", conditionSource);
 
-            var providerOptions = new Dictionary<string, string> {
-                //                    { "CompilerVersion", "v4.0" }
+            var providerOptions = new Dictionary<string, string>
+            {
+                // { "CompilerVersion", "v4.0" }
             };
             var provider = new CSharpCodeProvider(providerOptions);
-            var compilerParams = new CompilerParameters {
+            var compilerParams = new CompilerParameters
+            {
                 GenerateInMemory = false,
                 GenerateExecutable = false,
                 IncludeDebugInformation = true,
                 TreatWarningsAsErrors = false,
                 OutputAssembly = outputDllFile
-                // *** Useful for debugging
-                //,TempFiles = new TempFileCollection {KeepFiles = true}
+
+                //// *** Useful for debugging
+                ////,TempFiles = new TempFileCollection {KeepFiles = true}
             };
 
-            // Mono runtime 2/3 compatibility fix 
+            // Mono runtime 2/3 compatibility fix
             // TODO: this may not be required anymore
             var relocateSystemAsm = false;
             var type = Type.GetType("Mono.Runtime");
@@ -189,6 +190,7 @@ namespace HomeGenie.Automation.Scripting
                     }
                 }
             }
+
             if (!relocateSystemAsm)
             {
                 var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -224,7 +226,7 @@ namespace HomeGenie.Automation.Scripting
             compilerParams.ReferencedAssemblies.Add("SerialPortLib.dll");
             compilerParams.ReferencedAssemblies.Add("NetClientLib.dll");
 
-            //if (Raspberry.Board.Current.IsRaspberryPi)
+            // if (Raspberry.Board.Current.IsRaspberryPi)
             {
                 compilerParams.ReferencedAssemblies.Add("Raspberry.IO.dll");
                 compilerParams.ReferencedAssemblies.Add("Raspberry.IO.Components.dll");
@@ -242,6 +244,5 @@ namespace HomeGenie.Automation.Scripting
             // compile and generate script assembly
             return provider.CompileAssemblyFromSource(compilerParams, source);
         }
-
     }
 }
