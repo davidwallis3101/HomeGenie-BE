@@ -1,0 +1,635 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="HomeGenie.Automation.MacroRecorder" Collapsed="true">
+    <Position X="20" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAgBQAAAAGAAAAAACAAAAAAACAAAAAgAAQAUA=</HashCode>
+      <FileName>Automation\MacroRecorder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.ProgramBlock" Collapsed="true">
+    <Position X="23.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABBEEkEAAAAgAAAkIBEDQAQAAgCMQAAGBQAAAEAAAEI=</HashCode>
+      <FileName>Automation\ProgramBlock.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.ProgramCommand" Collapsed="true">
+    <Position X="25.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAIAAAAAACAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Automation\ProgramCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.ProgramCondition" Collapsed="true">
+    <Position X="27" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAgAAAAAAAAAEEQAAAAA=</HashCode>
+      <FileName>Automation\ProgramCondition.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.ProgramError" Collapsed="true">
+    <Position X="14.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAIAAAAAgBAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>Automation\ProgramError.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.ProgramFeature" Collapsed="true">
+    <Position X="16.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAADAAAAgAAAAAAAAAAAAAAAAAAQAAAAAAQAAAAA=</HashCode>
+      <FileName>Automation\ProgramFeature.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.ProgramManager" Collapsed="true">
+    <Position X="18.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAACAEAEAgAAMAKCAACAAhEEAQAACKAAAAAREAAAAI=</HashCode>
+      <FileName>Automation\ProgramManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.ScriptEngineErrors" Collapsed="true">
+    <Position X="16.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAACAgAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Automation\ScriptEngineErrors.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Engines.ArduinoAppFactory" Collapsed="true">
+    <Position X="16.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAAABBAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Automation\Engines\ArduinoAppFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Engines.ArduinoEngine" Collapsed="true">
+    <Position X="3.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkACAAAAABAAAAAAAAAAAAAAAQAAAAAAAAAAAAEI=</HashCode>
+      <FileName>Automation\Engines\ArduinoEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="HomeGenie.Automation.Engines.CSharpAppFactory" Collapsed="true">
+    <Position X="28.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAQAAABABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Automation\Engines\CSharpAppFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Engines.CSharpEngine" Collapsed="true">
+    <Position X="5.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkACQQEABBAAAAAAAQEQAAAEAQAAAAAAABAAEQEI=</HashCode>
+      <FileName>Automation\Engines\CSharpEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="HomeGenie.Automation.Engines.JavascriptEngine" Collapsed="true">
+    <Position X="7.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkACAAAAABAAAAIAAAAIAAAAAQAgAAAAAAAAAAEI=</HashCode>
+      <FileName>Automation\Engines\JavascriptEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="HomeGenie.Automation.Engines.ProgramEngineBase" Collapsed="true">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>UAACAAJAQggCAEAAAQCAIAAAQAgAgAAAEAQgAEAASBU=</HashCode>
+      <FileName>Automation\Engines\ProgramEngineBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Engines.PythonEngine" Collapsed="true">
+    <Position X="10" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkACAEAAABAAAAIAAAAIAAAAAQAAAAAAAAAAAAEI=</HashCode>
+      <FileName>Automation\Engines\PythonEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="HomeGenie.Automation.Engines.RubyEngine" Collapsed="true">
+    <Position X="12.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkACAEAAABAAAAIAAAAIAAAAAQAAAAAAAAAAAAEI=</HashCode>
+      <FileName>Automation\Engines\RubyEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="HomeGenie.Automation.Engines.WizardEngine" Collapsed="true">
+    <Position X="1" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAkACAAIAABAAAQIAAAAAAAAAAQAAAAAAAAAAAAEI=</HashCode>
+      <FileName>Automation\Engines\WizardEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="HomeGenie.ProgramDynamicApi" Collapsed="true">
+    <Position X="28.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAAAAJAAAACABAAAAAEAA=</HashCode>
+      <FileName>Automation\ProgramDynamicApi.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.ProgramHelperBase" Collapsed="true">
+    <Position X="3.5" Y="3.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEABIEAABAAEAAAAAAAAAAgAAIIAgAAAAAAAAAI=</HashCode>
+      <FileName>Automation\Scripting\ProgramHelperBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Store" Collapsed="true">
+    <Position X="16.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAQAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\Store.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Program" Collapsed="true">
+    <Position X="21.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAIBAAAAAAAEAAAACAAAAAAAAAAAAABQAAAQA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.SourceModule" Collapsed="true">
+    <Position X="25.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACAAAAAAAAAAEAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Service\Constants\SourceModule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scheduler.SchedulerItem" Collapsed="true">
+    <Position X="25.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAIAAAAgACAAAQEAAAQAAAgAABAIAAAAAAAgAAA=</HashCode>
+      <FileName>Automation\Scheduler\SchedulerItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scheduler.SchedulerScriptingEngine" Collapsed="true">
+    <Position X="27" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAMAAACAAAABAAIAAQAIAAAAAAAgAAACgEEAAAAA=</HashCode>
+      <FileName>Automation\Scheduler\SchedulerScriptingEngine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scheduler.MethodRunResult" Collapsed="true">
+    <Position X="23.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Automation\Scheduler\SchedulerScriptingHost.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scheduler.SchedulerScriptingHost" Collapsed="true">
+    <Position X="28.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgJcgAJCQALCgAAgQAQAAQAEAYABAAgIQgACAAAAg=</HashCode>
+      <FileName>Automation\Scheduler\SchedulerScriptingHost.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scheduler.SchedulerService" Collapsed="true">
+    <Position X="14.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gJAAgAABACABCkBAAAIADAAAAAAwACIIIAAiSAIQRAA=</HashCode>
+      <FileName>Automation\Scheduler\SchedulerService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.EventsHelper" Collapsed="true">
+    <Position X="20" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EIAAAEAAAgAAAAAgAAAAAAAAAAAAgCAAAAAAAAAAAJA=</HashCode>
+      <FileName>Automation\Scripting\EventsHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.KnxClientHelper" Collapsed="true">
+    <Position X="18.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgQAAAAIAAAATCAAAEAAQIACAgABAIQQAAAgAABAEAQ=</HashCode>
+      <FileName>Automation\Scripting\KnxClientHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.MethodRunResult" Collapsed="true">
+    <Position X="21.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Automation\Scripting\MethodRunResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.ModuleHelper" Collapsed="true">
+    <Position X="0.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAQAAAAAAAAAAAAACAAAAABQAAiAQQIAAUEAAAg=</HashCode>
+      <FileName>Automation\Scripting\ModuleHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.ModulesManager" Collapsed="true">
+    <Position X="0.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgEEgsAQIARAFAREAERCxAAQoUQCAJkBAQgQEAAMFKA=</HashCode>
+      <FileName>Automation\Scripting\ModulesManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.MqttEndPoint" Collapsed="true">
+    <Position X="16.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAACAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Automation\Scripting\MqttClientHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.MqttClientHelper" Collapsed="true">
+    <Position X="14.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQACAAAAAAABAAAAEAAAIAAAAACQAAAAAAKAAAAAAA=</HashCode>
+      <FileName>Automation\Scripting\MqttClientHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.NetHelper" Collapsed="true">
+    <Position X="18.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AWCAQgABMAAABAEAAGRAEQAgCAgAgggAgAQCAQAQCAg=</HashCode>
+      <FileName>Automation\Scripting\NetHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.ProgramHelper" Collapsed="true">
+    <Position X="3.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAECBAQBAAAAIEgSIABIAAQgABBAAAACUCAIAI=</HashCode>
+      <FileName>Automation\Scripting\ProgramHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.SchedulerHelper" Collapsed="true">
+    <Position X="23.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAEAAAAAAAAFEAAAAAAAAAAAAAAAIAAQAAAAAQAI=</HashCode>
+      <FileName>Automation\Scripting\SchedulerHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.ScriptingHost" Collapsed="true">
+    <Position X="18.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAQEAICAADGAAAgAAAAAQAkAIACAAgAAgACAABQg=</HashCode>
+      <FileName>Automation\Scripting\ScriptingHost.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.SerialPortHelper" Collapsed="true">
+    <Position X="21.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAACAAAAARABEASAAQKAAoAAAAAAACgAiAIAAAgA=</HashCode>
+      <FileName>Automation\Scripting\SerialPortHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.SettingsHelper" Collapsed="true">
+    <Position X="23.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Automation\Scripting\SettingsHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.StoreHelper" Collapsed="true">
+    <Position X="18.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAEAABABAAAAABAAAAAAAAAEAAAAAAAAAAAI=</HashCode>
+      <FileName>Automation\Scripting\StoreHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.TcpClientHelper" Collapsed="true">
+    <Position X="27" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAARABAATAAQKAAoAAAQAAACAAiAAAAAgQ=</HashCode>
+      <FileName>Automation\Scripting\TcpClientHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Automation.Scripting.UdpClientHelper" Collapsed="true">
+    <Position X="14.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IARAAAQAAAAABABAASAAQCAAoAAEAAAACAAiAAAIAgA=</HashCode>
+      <FileName>Automation\Scripting\UdpClientHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.Group" Collapsed="true">
+    <Position X="21.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQQAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Data\Group.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.Module" Collapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAQAAAAAgAAAAAAAAAAQAAgAAAAACAAAAAQACABA=</HashCode>
+      <FileName>Data\Module.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="HomeGenie.Data.ModuleEvent" Collapsed="true">
+    <Position X="25.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Data\ModuleEvent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.ModuleParameter" Collapsed="true">
+    <Position X="27" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACABAAAAgAYAEAEAABAwAAABAEAAAABAgAAAAAAA=</HashCode>
+      <FileName>Data\ModuleParameter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.ModuleReference" Collapsed="true">
+    <Position X="28.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Data\ModuleReference.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.SystemConfiguration" Collapsed="true">
+    <Position X="21.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAUAAAAAAAAAAAAEAEAAAAAAAARAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Data\SystemConfiguration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.HomeGenieConfiguration" Collapsed="true">
+    <Position X="23.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAEAAIAAABAAAAAAAAAggAAAAAAAAA=</HashCode>
+      <FileName>Data\SystemConfiguration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.SystemConfiguration_1_0" Collapsed="true">
+    <Position X="23.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\SystemConfiguration_1_0.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.HomeGenieConfiguration_1_0" Collapsed="true">
+    <Position X="25.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EABAAAAAAAAAAAAEAAIAAABAAAAAAAAAggAAAAIBAAA=</HashCode>
+      <FileName>Data\SystemConfiguration_1_0.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.ValueStatistics" Collapsed="true">
+    <Position X="21.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAgAANYAAAASAAAAQCAIAAAAAAAAAAAAAAiAAAAgAA=</HashCode>
+      <FileName>Data\ValueStatistics.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Data.VirtualModule" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Data\VirtualModule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.BackupManager" Collapsed="true">
+    <Position X="20" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEQAAABAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Service\BackupManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.HomeGenieService" Collapsed="true">
+    <Position X="27" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>rBugEEQCBSGggIBUIKRIUKgTJAgBgJIGOOgAAHADJIA=</HashCode>
+      <FileName>Service\HomeGenieService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.JsonHelper" Collapsed="true">
+    <Position X="16.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\JsonHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.PackageManager" Collapsed="true">
+    <Position X="20" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAsAACIAAAAAAAAAAAAAAAAAEEEAAAAwAAAAAAEA=</HashCode>
+      <FileName>Service\PackageManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.StringCipher" Collapsed="true">
+    <Position X="20" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAQAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\StringCipher.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.ReleaseInfo" Collapsed="true">
+    <Position X="21.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAoAAAAAAQIAAQAAAAAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>Service\UpdateChecker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.ArchiveDownloadEventArgs" Collapsed="true">
+    <Position X="14.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\UpdateChecker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.UpdateProgressEventArgs" Collapsed="true">
+    <Position X="18.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\UpdateChecker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.UpdateChecker" Collapsed="true">
+    <Position X="16.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACCUwBACgEBgAAAAACAAYABDAAAASF4AACDAACAAg=</HashCode>
+      <FileName>Service\UpdateChecker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.SerializationExtensions" Collapsed="true">
+    <Position X="20" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\Utility.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.DateTimeExtensions" Collapsed="true">
+    <Position X="14.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\Utility.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.TsList&lt;T&gt;" Collapsed="true">
+    <Position X="28.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAABAAAAAAAAAQBAgAAAAAAAAAIAAAAABAAAA=</HashCode>
+      <FileName>Service\Utility.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Utility" Collapsed="true">
+    <Position X="20" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAkjAAAADAAEAQAEwQgCCAAAAEAMgQQAAAAAEAQ=</HashCode>
+      <FileName>Service\Utility.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.DynamicXmlParser" Collapsed="true">
+    <Position X="18.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAECAAAAAAICAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\Utility.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.ConsoleRedirect" Collapsed="true">
+    <Position X="27" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAEAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Service\Utility.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.IgnorePropertyContractResolver" Collapsed="true">
+    <Position X="28.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\Utility.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.VirtualMeter" Collapsed="true">
+    <Position X="23.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAACAAAABAAIAAAAAAAAAAAAEAIAAAAAAAAAA=</HashCode>
+      <FileName>Service\VirtualMeter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Constants.Commands" Collapsed="true">
+    <Position X="21.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\Constants\Commands.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Constants.Domains" Collapsed="true">
+    <Position X="16.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAQAAAAEAAAAAAAAAYAABAgAACAAAAgAQcACA=</HashCode>
+      <FileName>Service\Constants\Domains.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Constants.Properties" Collapsed="true">
+    <Position X="20" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FAAwERAIAAEAYAAAAAAAgAEAACAIAIAUACAAIEACCAA=</HashCode>
+      <FileName>Service\Constants\Properties.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Handlers.Automation" Collapsed="true">
+    <Position X="18.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAABAgAAAAAAEAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Service\Handlers\Automation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Handlers.Config" Collapsed="true">
+    <Position X="23.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAABAAAAAAAAAAAAABACQAAAAAAAA=</HashCode>
+      <FileName>Service\Handlers\Config.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Handlers.Interconnection" Collapsed="true">
+    <Position X="14.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\Handlers\Interconnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Handlers.Statistics" Collapsed="true">
+    <Position X="27" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\Handlers\Statistics.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Logging.StatisticsEntry" Collapsed="true">
+    <Position X="28.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAgAAAAAAAAAAgAAAAACAAQgAAAAAAA=</HashCode>
+      <FileName>Service\Logging\StatisticsLogger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Logging.StatisticsLogger" Collapsed="true">
+    <Position X="14.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAgMBMgIIiwABIAAAiAAgBAgAIAaAAAAIAAABAQCAAA=</HashCode>
+      <FileName>Service\Logging\StatisticsLogger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HomeGenie.Service.Logging.SystemLogger" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQABAEAACAAAAKAAAAAACgAQIBAAAgAQAAAAAAEABA=</HashCode>
+      <FileName>Service\Logging\SystemLogger.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="HomeGenie.Service.Logging.ConsoleRedirect" Collapsed="true">
+    <Position X="25.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAEAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Service\Logging\SystemLogger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="HomeGenie.Automation.Engines.IProgramEngine" Collapsed="true">
+    <Position X="14.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkACAAAAABAAAAAAAAAAAAAAAQAAAAAAAAAAAAEI=</HashCode>
+      <FileName>Automation\Engines\IProgramEngine.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="HomeGenie.Automation.ComparisonOperator" Collapsed="true">
+    <Position X="18.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAgAAAAAAAABAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Automation\ComparisonOperator.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="HomeGenie.Automation.MacroDelayType" Collapsed="true">
+    <Position X="21.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAEAA=</HashCode>
+      <FileName>Automation\MacroRecorder.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="HomeGenie.Automation.ConditionType" Collapsed="true">
+    <Position X="20" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAACAEAAAAAAAAQAAAAAAAAAAAEBAAA=</HashCode>
+      <FileName>Automation\ProgramCondition.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="HomeGenie.Automation.Scripting.CodeBlockEnum" Collapsed="true">
+    <Position X="16.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Automation\Scripting\CodeBlockEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="HomeGenie.Service.ArchiveDownloadStatus" Collapsed="true">
+    <Position X="14.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAACAAAAgAAAAAAAAAAAAAAAAACAAAAAAAgA=</HashCode>
+      <FileName>Service\UpdateChecker.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="HomeGenie.Service.UpdateProgressStatus" Collapsed="true">
+    <Position X="23.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAgAAAAAAAAAACAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Service\UpdateChecker.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

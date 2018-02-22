@@ -1,4 +1,4 @@
-/*
+﻿/*
     This file is part of HomeGenie Project source code.
 
     HomeGenie is free software: you can redistribute it and/or modify
@@ -15,30 +15,20 @@
     along with HomeGenie.  If not, see <http://www.gnu.org/licenses/>.  
 */
 
-/*
- *     Author: Generoso Martello <gene@homegenie.it>
- *     Project Homepage: http://homegenie.it
- */
-
-using System;
-using System.Collections.Generic;
-
-namespace HomeGenie.Data
+namespace HomeGenie.Enums
 {
-    [Serializable()]
-    public class Group
+    /// <summary>
+    /// An enum containing the possible events that trigger a potential change in occupancy state
+    /// </summary>
+    public enum Trigger
     {
-        public string Name { get; set; }
-        public string Wallpaper { get; set; }
-
-        public List<ModuleReference> Modules { get; set; }
-
-        public Group()
-        {
-            Name = string.Empty;
-            Wallpaper = string.Empty;
-            Modules = new List<ModuleReference>();
-        }
+        DoorOpens,
+        DoorCloses,
+        SensorActivity,
+        AlarmFullSet,
+        AlarmPartSet,
+        AlarmUnset,
+        OccupancyTimerExpires,
+        ChildOccupied
     }
 }
-

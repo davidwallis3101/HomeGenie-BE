@@ -106,6 +106,9 @@
       <HintPath>..\Externals\NCrontab\NCrontab.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Stateless, Version=4.0.0.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Stateless.4.0.0\lib\net45\Stateless.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ServiceProcess" />
@@ -201,9 +204,12 @@
     <Compile Include="Automation\Scripting\EventsHelper.cs" />
     <Compile Include="Automation\Scripting\TcpClientHelper.cs" />
     <Compile Include="Automation\Scripting\SerialPortHelper.cs" />
+    <Compile Include="Data\Location.cs" />
     <Compile Include="Data\ModuleEvent.cs" />
     <Compile Include="Data\ValueStatistics.cs" />
     <Compile Include="Data\VirtualModule.cs" />
+    <Compile Include="Enums\OccupancyState.cs" />
+    <Compile Include="Enums\Triggers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\Constants\Commands.cs" />
@@ -279,6 +285,7 @@
     </None>
     <None Include="app.config" />
     <None Include="app.manifest" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
