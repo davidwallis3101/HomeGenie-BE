@@ -56,7 +56,7 @@ namespace HomeGenie.Data
                     if (Parent == null) return;
                     if (Parent.TryUpdateState(Trigger.ChildOccupied))
                     {
-                        Console.WriteLine($"Child [{Name}] Occupied, setting parent [{Parent.Name}] state to ChildOccupied");
+                        Console.WriteLine($"[{Name}] Occupied, setting parent [{Parent.Name}] state to ChildOccupied");
                     }
                     else
                     {
@@ -112,7 +112,7 @@ namespace HomeGenie.Data
         /// </summary>
         private void ResetTimer()
         {
-            Console.WriteLine($"{Name} Occupancy timer restarting");
+            Console.WriteLine($"[{Name}] Occupancy timer restarting");
             occupancyTimer.Stop();
             occupancyTimer.Start();
         }
@@ -140,15 +140,15 @@ namespace HomeGenie.Data
                 occupancyTimer.Stop();
                 IsTimerRunning = false;
 
-                Console.WriteLine($"{Name} Occupancy timer expired and removed");
+                Console.WriteLine($"[{Name}] Occupancy timer expired and removed");
                 if (stateMachine.IsInState(OccupancyState.Occupied))
                 {
-                    Console.WriteLine("{0} in state {1}", Name, stateMachine.State);
+                    Console.WriteLine("[{0}] currently in state [{1}] - firing OccupancyTimerExpires trigger", Name, stateMachine.State);
                     stateMachine.Fire(Trigger.OccupancyTimerExpires);
                 }
             };
             occupancyTimer.Start();
-            Console.WriteLine($"{Name} Occupancy timer started");
+            Console.WriteLine($"[{Name}] Occupancy timer started");
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace HomeGenie.Data
             //_children = new ObservableCollection<Location>();
             Children = new List<Location>();
             //  _children.CollectionChanged += CollectionChanged;
-            OccupancyTimeout = new TimeSpan(0, 0, 0, 5);
+            OccupancyTimeout = new TimeSpan(0, 0, 0, 30);
 
             parent?.Children.Add(this);
 
