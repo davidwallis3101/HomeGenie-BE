@@ -21,10 +21,7 @@
  */
 
 using System;
-using System.Collections.Generic;
-
 using System.IO;
-using System.Xml.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 using Newtonsoft.Json;
@@ -55,6 +52,12 @@ namespace HomeGenie.Data
         public string Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the location.
+        /// </summary>
+        /// <value>The location.</value>
+        public TsList<Location> ModuleLocation { get; get; }
+        
+        /// <summary>
         /// Gets or sets the type of the device.
         /// </summary>
         /// <value>The type of the device.</value>
@@ -83,17 +86,16 @@ namespace HomeGenie.Data
         public TsList<Store> Stores { get; set; }
 
         public string RoutingNode { get; set; }
-        // "<ip>:<port>" || ""
 
         public Module()
         {
-            Name = "";
-            Address = "";
-            Description = "";
-            DeviceType = MIG.ModuleTypes.Generic;
+            Name = string.Empty;
+            Address = string.Empty;
+            Description = string.Empty;
+            DeviceType = ModuleTypes.Generic;
             Properties = new TsList<ModuleParameter>();
             Stores = new TsList<Store>();
-            RoutingNode = "";
+            RoutingNode = string.Empty;
         }
 
         public object Clone()
