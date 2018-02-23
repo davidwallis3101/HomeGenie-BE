@@ -25,9 +25,6 @@ using System.Collections.Generic;
 
 using System.IO;
 using System.Xml.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-
-using MIG;
 using MIG.Config;
 
 using HomeGenie.Service;

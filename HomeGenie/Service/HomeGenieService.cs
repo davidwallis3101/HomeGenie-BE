@@ -918,11 +918,11 @@ namespace HomeGenie.Service
         public void LoadConfiguration()
         {
             LoadSystemConfig();
-            //
             // load modules data
-            //
             LoadModules();
-            //
+
+
+            // TODO Extract to common method with tests
             // load last saved groups data into controlGroups list
             try
             {
@@ -930,11 +930,17 @@ namespace HomeGenie.Service
                 using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "groups.xml")))
                     controlGroups = (List<Group>)serializer.Deserialize(reader);
             }
-            catch
+            catch (Exception ex)
             {
-                //TODO: log error
+                LogError(
+                    Domains.HomeAutomation_HomeGenie,
+                    "LoadConfiguration()",
+                    ex.Message,
+                    "Exception.StackTrace",
+                    ex.StackTrace
+                );
             }
-            //
+
             // load last saved automation groups data into automationGroups list
             try
             {
@@ -942,13 +948,18 @@ namespace HomeGenie.Service
                 using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "automationgroups.xml")))
                     automationGroups = (List<Group>)serializer.Deserialize(reader);
             }
-            catch
+            catch (Exception ex)
             {
-                //TODO: log error
+                LogError(
+                    Domains.HomeAutomation_HomeGenie,
+                    "LoadConfiguration()",
+                    ex.Message,
+                    "Exception.StackTrace",
+                    ex.StackTrace
+                );
             }
-            //
+
             // load last saved programs data into masterControlProgram.Programs list
-            //
             if (masterControlProgram != null)
             {
                 masterControlProgram.Enabled = false;
@@ -984,9 +995,8 @@ namespace HomeGenie.Service
                     ex.StackTrace
                 );
             }
-            //
+
             // load last saved scheduler items data into masterControlProgram.SchedulerService.Items list
-            //
             try
             {
                 var serializer = new XmlSerializer(typeof(List<SchedulerItem>));
@@ -996,15 +1006,21 @@ namespace HomeGenie.Service
                     masterControlProgram.SchedulerService.Items.AddRange(schedulerItems);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                //TODO: log error
+                LogError(
+                    Domains.HomeAutomation_HomeGenie,
+                    "LoadConfiguration()",
+                    ex.Message,
+                    "Exception.StackTrace",
+                    ex.StackTrace
+                );
             }
+
             // force re-generation of Modules list
             modules_RefreshAll();
-            //
+
             // enable automation programs engine
-            //
             masterControlProgram.Enabled = true;
         }
 
@@ -1472,6 +1488,7 @@ namespace HomeGenie.Service
                     ex.StackTrace
                 );
             }
+
             try
             {
                 // Reset Parameter.Watts, /*Status Level,*/ Sensor.Generic values

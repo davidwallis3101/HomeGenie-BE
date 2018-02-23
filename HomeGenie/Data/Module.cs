@@ -55,8 +55,8 @@ namespace HomeGenie.Data
         /// Gets or sets the location.
         /// </summary>
         /// <value>The location.</value>
-        public TsList<Location> ModuleLocation { get; get; }
-        
+        public string Location { get; set; }
+
         /// <summary>
         /// Gets or sets the type of the device.
         /// </summary>
@@ -96,6 +96,7 @@ namespace HomeGenie.Data
             Properties = new TsList<ModuleParameter>();
             Stores = new TsList<Store>();
             RoutingNode = string.Empty;
+            Location = string.Empty;
         }
 
         public object Clone()

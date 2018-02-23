@@ -20,13 +20,9 @@
  *     Project Homepage: http://homegenie.it
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using HomeGenie.Data;
 using HomeGenie.Service;
+using System;
 
 namespace HomeGenie.Automation.Scripting
 {
@@ -49,8 +45,7 @@ namespace HomeGenie.Automation.Scripting
         {
             get
             {
-                var selectedModules = new TsList<Data.Module>();
-                selectedModules.Add(module);
+                var selectedModules = new TsList<Data.Module> {module};
                 return selectedModules;
             }
         }
@@ -65,16 +60,6 @@ namespace HomeGenie.Automation.Scripting
             return (module.Name.ToLower() == name.ToLower());
         }
 
-        [Obsolete("Use 'Exists' instead")]
-        public bool WasFound
-        {
-            get { return module != null; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether this <see cref="HomeGenie.Automation.Scripting.ModuleHelper"/> has a valid module instance.
-        /// </summary>
-        /// <value><c>true</c> if module instance is valid; otherwise, <c>false</c>.</value>
         public bool Exists
         {
             get { return module != null; }
@@ -87,17 +72,25 @@ namespace HomeGenie.Automation.Scripting
         /// <param name="domain">Domain.</param>
         public bool IsInDomain(string domain)
         {
-            return module.Domain.ToLower() == domain.ToLower();
+            return string.Equals(module.Domain, domain, StringComparison.CurrentCultureIgnoreCase);
         }
+
+        /// <summary>
+        /// Determines whether this module is in the specified location.
+        /// </summary>
+        /// <returns><c>true</c> if this module is in the specified location.; otherwise, <c>false</c>.</returns>
+        /// <param name="location">Domain.</param>
+        public bool IsInLocation(string location)
+        {
+            return string.Equals(module.Location, location, StringComparison.CurrentCultureIgnoreCase);
+        }
+
 
         /// <summary>
         /// Gets the underlying module instance.
         /// </summary>
         /// <value>The instance.</value>
-        public Module Instance
-        {
-            get { return module; }
-        }
+        public Module Instance => module;
 
         /// <summary>
         /// Determines whether this module is in the specified groupList.
