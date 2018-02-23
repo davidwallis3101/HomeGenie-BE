@@ -9,14 +9,20 @@ skip_branch_with_pr: true
 branches:
   only:
   - master
+  - /V.*/
 clone_folder: c:\projects\homegenie
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
 
 #---------------------------------#
 #     install configuration       #
 #---------------------------------#
 
 install:
-  # - git clone https://github.com/genielabs/mig-service-dotnet.git
+  # - git clone https://github.com/Bounz/mig-service-dotnet.git
   
   # Install innosetup
   - choco install -y curl innosetup
@@ -35,6 +41,9 @@ install:
 #---------------------------------#
 #      build configuration        #
 #---------------------------------#
+
+before_build:
+  - nuget restore HomeGenie_Windows\HomeGenie_VS10.sln
 
 #build:
 #  project: c:\projects\homegenie\HomeGenie_Windows\HomeGenie_VS10.sln
@@ -59,7 +68,8 @@ build_script:
 #  pre deployment configuration   #
 #---------------------------------#
 
-before_deploy:
+#before_deploy:
+after_build:
   - ps: . "$($env:APPVEYOR_BUILD_FOLDER)\HomeGenie_Linux\Packager\builddeb.ps1"
 
   # Call wpkg to create .deb package
@@ -75,6 +85,7 @@ before_deploy:
 # create windows setup (exe) file #
 #---------------------------------#
 
+  - ps: (Get-Content "c:\projects\HomeGenie\HomeGenie_Windows\Packager\setup.iss") -replace "_version_", "$($env:APPVEYOR_BUILD_VERSION)" | out-file "c:\projects\HomeGenie\HomeGenie_Windows\Packager\setup.iss" -encoding ASCII -force
   - iscc c:\projects\HomeGenie\HomeGenie_Windows\Packager\setup.iss /Oc:\projects\homegenie\release /Fhomegenie_%APPVEYOR_BUILD_VERSION%_all
 
 #---------------------------------#
