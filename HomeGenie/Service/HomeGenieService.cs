@@ -16,50 +16,40 @@ using HomeGenie.Service.Updates;
 using MIG;
 using MIG.Gateways;
 using NLog;
+using NLog.Fluent;
 using OpenSource.UPnP;
 
 namespace HomeGenie.Service
 {
     [Serializable]
     public class HomeGenieService
-    {
-        #region Private Fields declaration
-
+    { 
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         private MigService migService;
         private WebServiceGateway webGateway;
         private ProgramManager masterControlProgram;
         private VirtualMeter virtualMeter;
-        //private UpdateChecker updateChecker;
+
         private UpdateManager _updateManager;
         private BackupManager backupManager;
         private PackageManager packageManager;
         private StatisticsLogger statisticsLogger;
-        // Internal data structures
+
         private TsList<Module> systemModules = new TsList<Module>();
         private TsList<Module> modulesGarbage = new TsList<Module>();
         private TsList<VirtualModule> virtualModules = new TsList<VirtualModule>();
         private List<Group> automationGroups = new List<Group>();
         private List<Group> controlGroups = new List<Group>();
-        //
+        private List<Location> locations = new List<Location>();
+
         private SystemConfiguration systemConfiguration;
-        //
-        // public events
-        //public event Action<LogEntry> LogEventAction;
-
-        #endregion
-
-        #region Web Service Handlers declaration
 
         private Handlers.Config wshConfig;
         private Handlers.Automation wshAutomation;
         private Handlers.Interconnection wshInterconnection;
         private Handlers.Statistics wshStatistics;
 
-        #endregion
-
-        #region Lifecycle
 
         public HomeGenieService()
         {
@@ -227,51 +217,36 @@ namespace HomeGenie.Service
             Stop();
         }
 
-        #endregion
-
-        #region Data Wrappers - Public Members
+        public List<Location> Locations => locations;
 
         // Control groups (i.e. rooms, Outside, Housewide)
         public List<Group> Groups => controlGroups;
 
-        // Automation groups
         public List<Group> AutomationGroups => automationGroups;
 
-        // MIG interfaces
         public List<MigInterface> Interfaces => migService.Interfaces;
 
-        // Modules
         public TsList<Module> Modules => systemModules;
 
-        // Virtual modules
         public TsList<VirtualModule> VirtualModules => virtualModules;
 
-        // HomeGenie system parameters
         public List<ModuleParameter> Parameters => systemConfiguration.HomeGenie.Settings;
 
-        // Reference to SystemConfiguration
         public SystemConfiguration SystemConfiguration => systemConfiguration;
 
-        // Reference to MigService
         public MigService MigService => migService;
 
-        // Reference to ProgramEngine
         public ProgramManager ProgramManager => masterControlProgram;
 
-        // Reference to UpdateChecked
         public UpdateChecker UpdateChecker => _updateManager.UpdateChecker;
         public UpdateInstaller UpdateInstaller => _updateManager.UpdateInstaller;
-
-        // Reference to BackupManager
+        
         public BackupManager BackupManager => backupManager;
 
-        // Reference to PackageManager
         public PackageManager PackageManager => packageManager;
 
-        // Reference to Statistics
         public StatisticsLogger Statistics => statisticsLogger;
 
-        // Public utility methods
         public string GetHttpServicePort()
         {
             return webGateway.GetOption("Port").Value;
@@ -318,7 +293,7 @@ namespace HomeGenie.Service
                         LogError(Domains.HomeAutomation_HomeGenie, "InterfaceControl", ex.Message, "Exception.StackTrace", ex.StackTrace);
                     }
                 }
-                //
+
                 // Route command to Automation Programs' Dynamic API
                 var r = ProgramDynamicApi.TryApiCall(cmd);
                 if (r != null && !String.IsNullOrWhiteSpace(r.ToString()))
@@ -326,9 +301,8 @@ namespace HomeGenie.Service
                     // Automation Programs can eventually override MIG response
                     response = r;
                 }
-                //
+
                 // Macro Recording
-                //
                 // TODO: find a better solution for this.... 
                 // TODO: it was: migService_ServiceRequestPostProcess(this, new ProcessRequestEventArgs(cmd));
                 // TODO: !IMPORTANT!
@@ -338,6 +312,11 @@ namespace HomeGenie.Service
                 }
             }
             return response;
+        }
+
+        public List<Location> GetLocations()
+        {
+            return locations;
         }
 
         public List<Group> GetGroups(string namePrefix)
@@ -432,10 +411,6 @@ namespace HomeGenie.Service
             return true;
         }
 
-        #endregion
-
-        #region MIG Events Propagation / Logging
-
         internal void RaiseEvent(object sender, MigEvent evt)
         {
             migService.RaiseEvent(sender, evt);
@@ -492,10 +467,6 @@ namespace HomeGenie.Service
             Console.SetOut(outputRedirect);
             Console.SetError(outputRedirect);
         }
-
-        #endregion
-
-        #region MIG Service events handling
 
         private void migService_InterfaceModulesChanged(object sender, InterfaceModulesChangedEventArgs args)
         {
@@ -679,10 +650,6 @@ namespace HomeGenie.Service
                 masterControlProgram.MacroRecorder.AddCommand(command);
             }
         }
-
-        #endregion
-
-        #region Initialization and Data Persistence
 
         public bool UpdateGroupsDatabase(string namePrefix)
         {
@@ -884,46 +851,18 @@ namespace HomeGenie.Service
         public void LoadConfiguration()
         {
             LoadSystemConfig();
+
             // load modules data
             LoadModules();
-
-
-            // TODO Extract to common method with tests
-            // load last saved groups data into controlGroups list
-            try
-            {
-                var serializer = new XmlSerializer(typeof(List<Group>));
-                using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "groups.xml")))
-                    controlGroups = (List<Group>)serializer.Deserialize(reader);
-            }
-            catch (Exception ex)
-            {
-                LogError(
-                    Domains.HomeAutomation_HomeGenie,
-                    "LoadConfiguration()",
-                    ex.Message,
-                    "Exception.StackTrace",
-                    ex.StackTrace
-                );
-            }
+            
+            // TODO change to a common import method with tests
+            LoadGroups();
 
             // load last saved automation groups data into automationGroups list
-            try
-            {
-                var serializer = new XmlSerializer(typeof(List<Group>));
-                using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "automationgroups.xml")))
-                    automationGroups = (List<Group>)serializer.Deserialize(reader);
-            }
-            catch (Exception ex)
-            {
-                LogError(
-                    Domains.HomeAutomation_HomeGenie,
-                    "LoadConfiguration()",
-                    ex.Message,
-                    "Exception.StackTrace",
-                    ex.StackTrace
-                );
-            }
+            LoadAutomationGroups();
+
+            // Load locations from XML file
+            locations = LoadConfigurationData<Location>(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "locations.xml"), Log);
 
             // load last saved programs data into masterControlProgram.Programs list
             if (masterControlProgram != null)
@@ -932,12 +871,50 @@ namespace HomeGenie.Service
                 masterControlProgram = null;
             }
             masterControlProgram = new ProgramManager(this);
+
+            LoadPrograms();
+
+            LoadSchedulerItems();
+
+            // force re-generation of Modules list
+            modules_RefreshAll();
+
+            // enable automation programs engine
+            masterControlProgram.Enabled = true;
+        }
+
+        private void LoadSchedulerItems()
+        {
+            // load last saved scheduler items data into masterControlProgram.SchedulerService.Items list
+            try
+            {
+                var serializer = new XmlSerializer(typeof(List<SchedulerItem>));
+                using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scheduler.xml")))
+                {
+                    var schedulerItems = (List<SchedulerItem>) serializer.Deserialize(reader);
+                    masterControlProgram.SchedulerService.Items.AddRange(schedulerItems);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError(
+                    Domains.HomeAutomation_HomeGenie,
+                    "LoadConfiguration()",
+                    ex.Message,
+                    "Exception.StackTrace",
+                    ex.StackTrace
+                );
+            }
+        }
+
+        private void LoadPrograms()
+        {
             try
             {
                 var serializer = new XmlSerializer(typeof(List<ProgramBlock>));
                 using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "programs.xml")))
                 {
-                    var programs = (List<ProgramBlock>)serializer.Deserialize(reader);
+                    var programs = (List<ProgramBlock>) serializer.Deserialize(reader);
                     foreach (var program in programs)
                     {
                         program.IsRunning = false;
@@ -961,16 +938,46 @@ namespace HomeGenie.Service
                     ex.StackTrace
                 );
             }
+        }
 
-            // load last saved scheduler items data into masterControlProgram.SchedulerService.Items list
+        private static List<T> LoadConfigurationData<T>(string path, Logger log)
+        {
+            if (File.Exists(path) == false)
+            {
+                log.Info($"{path} doesn't exist, unable to load configuration.");
+                return null;
+            }
+
+            log.Info($"Loading Configuration from {path}");
+
             try
             {
-                var serializer = new XmlSerializer(typeof(List<SchedulerItem>));
-                using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scheduler.xml")))
+                var serializer = new XmlSerializer(typeof(List<T>));
+                using (var reader = new StreamReader(path))
                 {
-                    var schedulerItems = (List<SchedulerItem>)serializer.Deserialize(reader);
-                    masterControlProgram.SchedulerService.Items.AddRange(schedulerItems);
+                    return (List<T>) serializer.Deserialize(reader);
                 }
+            }
+            catch (Exception ex)
+            {
+                LogError(
+                    Domains.HomeAutomation_HomeGenie,
+                    $"LoadConfigurationData<{typeof(T).FullName}>",
+                    ex.Message,
+                    "Exception.StackTrace",
+                    ex.StackTrace
+                );
+            }
+            return null;
+        }
+
+        private void LoadAutomationGroups()
+        {
+            try
+            {
+                var serializer = new XmlSerializer(typeof(List<Group>));
+                using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "automationgroups.xml")))
+                    automationGroups = (List<Group>)serializer.Deserialize(reader);
             }
             catch (Exception ex)
             {
@@ -982,12 +989,27 @@ namespace HomeGenie.Service
                     ex.StackTrace
                 );
             }
+        }
 
-            // force re-generation of Modules list
-            modules_RefreshAll();
-
-            // enable automation programs engine
-            masterControlProgram.Enabled = true;
+        private void LoadGroups()
+        {
+            // load last saved groups data into controlGroups list
+            try
+            {
+                var serializer = new XmlSerializer(typeof(List<Group>));
+                using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "groups.xml")))
+                    controlGroups = (List<Group>) serializer.Deserialize(reader);
+            }
+            catch (Exception ex)
+            {
+                LogError(
+                    Domains.HomeAutomation_HomeGenie,
+                    "LoadConfiguration()",
+                    ex.Message,
+                    "Exception.StackTrace",
+                    ex.StackTrace
+                );
+            }
         }
 
         public void RestoreFactorySettings()
@@ -1004,19 +1026,13 @@ namespace HomeGenie.Service
             SaveData();
         }
 
-        #endregion Initialization and Data Storage
-
-        #region Misc events handlers
 
         // fired after configuration is written to systemconfiguration.xml
         private void systemConfiguration_OnUpdate(bool success)
         {
             modules_RefreshAll();
         }
- 
-        #endregion
 
-        #region Internals for modules' structure update and sorting
 
         internal void modules_RefreshVirtualModules()
         {
@@ -1324,7 +1340,6 @@ namespace HomeGenie.Service
             }
         }
 
-        #endregion
 
         #region Private utility methods
 

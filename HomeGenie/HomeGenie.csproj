@@ -109,6 +109,9 @@
     <Reference Include="SharpCompress, Version=0.19.2.0, Culture=neutral, PublicKeyToken=afb0a02973931d96">
       <HintPath>..\packages\SharpCompress.0.19.2\lib\net45\SharpCompress.dll</HintPath>
     </Reference>
+    <Reference Include="Stateless, Version=4.0.0.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Stateless.4.0.0\lib\net45\Stateless.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Net.Http" />
@@ -202,9 +205,12 @@
     <Compile Include="Automation\Scripting\EventsHelper.cs" />
     <Compile Include="Automation\Scripting\TcpClientHelper.cs" />
     <Compile Include="Automation\Scripting\SerialPortHelper.cs" />
+    <Compile Include="Data\Location.cs" />
     <Compile Include="Data\ModuleEvent.cs" />
     <Compile Include="Data\ValueStatistics.cs" />
     <Compile Include="Data\VirtualModule.cs" />
+    <Compile Include="Enums\OccupancyState.cs" />
+    <Compile Include="Enums\Triggers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\Constants\Commands.cs" />
