@@ -858,6 +858,8 @@ namespace HomeGenie.Service
             // TODO change to a common import method with tests
             LoadGroups();
 
+            LoadLocations();
+
             // load last saved automation groups data into automationGroups list
             LoadAutomationGroups();
 
@@ -1012,6 +1014,26 @@ namespace HomeGenie.Service
             }
         }
 
+        private void LoadLocations()
+        {
+            try
+            {
+                var serializer = new XmlSerializer(typeof(List<Location>));
+                using (var reader = new StreamReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "locations.xml")))
+                    locations = (List<Location>)serializer.Deserialize(reader);
+            }
+            catch (Exception ex)
+            {
+                LogError(
+                    Domains.HomeAutomation_HomeGenie,
+                    "LoadLocations()",
+                    ex.Message,
+                    "Exception.StackTrace",
+                    ex.StackTrace
+                );
+            }
+        }
+
         public void RestoreFactorySettings()
         {
             // Stop program engine
@@ -1032,7 +1054,6 @@ namespace HomeGenie.Service
         {
             modules_RefreshAll();
         }
-
 
         internal void modules_RefreshVirtualModules()
         {
