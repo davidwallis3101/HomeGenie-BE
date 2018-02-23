@@ -224,6 +224,8 @@ namespace HomeGenie.Service
 
         public List<Group> AutomationGroups => automationGroups;
 
+        public List<Location> AutomationLocations => locations;
+
         public List<MigInterface> Interfaces => migService.Interfaces;
 
         public TsList<Module> Modules => systemModules;
@@ -1048,7 +1050,6 @@ namespace HomeGenie.Service
             SaveData();
         }
 
-
         // fired after configuration is written to systemconfiguration.xml
         private void systemConfiguration_OnUpdate(bool success)
         {
@@ -1360,7 +1361,6 @@ namespace HomeGenie.Service
                 }
             }
         }
-
 
         #region Private utility methods
 

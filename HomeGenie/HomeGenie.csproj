@@ -195,6 +195,7 @@
     <Compile Include="Automation\Scheduler\SchedulerService.cs" />
     <Compile Include="Automation\ScriptEngineErrors.cs" />
     <Compile Include="Automation\Scripting\CodeBlockEnum.cs" />
+    <Compile Include="Automation\Scripting\LocationHelper.cs" />
     <Compile Include="Automation\Scripting\MethodRunResult.cs" />
     <Compile Include="Automation\Scripting\ScriptingHost.cs" />
     <Compile Include="Automation\Scripting\ModuleHelper.cs" />
