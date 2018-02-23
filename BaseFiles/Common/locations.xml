@@ -1,7 +1,139 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ArrayOfLocation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ArrayOfLocation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Location>
-        <Name>Color Lights</Name>
-        <Wallpaper>wallpaper_009.jpg</Wallpaper>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Home</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>House</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Garden</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Rear Garden</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Front Garden</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Side Garden</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>House</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Upstairs</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Downstairs</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Front Bedroom</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Back Bedroom</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Office</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Bathroom</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Upstairs Hall</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Kitchen</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>DownstairsHall</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
+    </Location>
+    <Location>
+        <OccupancyTimeout />
+        <Temperature>0</Temperature>
+        <Name>Front Room</Name>
+        <Children />
+        <IsTimerRunning>false</IsTimerRunning>
+        <OccupancyState>UnOccupied</OccupancyState>
     </Location>
 </ArrayOfLocation>
