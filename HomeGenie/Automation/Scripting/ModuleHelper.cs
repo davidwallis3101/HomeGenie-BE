@@ -85,7 +85,6 @@ namespace HomeGenie.Automation.Scripting
             return string.Equals(module.Location, location, StringComparison.CurrentCultureIgnoreCase);
         }
 
-
         /// <summary>
         /// Gets the underlying module instance.
         /// </summary>

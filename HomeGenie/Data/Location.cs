@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HomeGenie.Enums;
+using HomeGenie.Service;
+using HomeGenie.Service.Constants;
+using MIG;
+using NLog;
 using Stateless;
 
 namespace HomeGenie.Data
@@ -11,6 +15,8 @@ namespace HomeGenie.Data
     [Serializable]
     public class Location
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The occupancy timer
         /// </summary>
@@ -56,11 +62,12 @@ namespace HomeGenie.Data
                     if (Parent == null) return;
                     if (Parent.TryUpdateState(Trigger.ChildOccupied))
                     {
-                        Console.WriteLine($"[{Name}] Occupied, setting parent [{Parent.Name}] state to ChildOccupied");
+                        //Console.WriteLine($"[{Name}] Occupied, setting parent [{Parent.Name}] state to ChildOccupied");
+                        logger.Info($"{Domains.HomeAutomation_HomeGenie} [{Name}] Occupied, setting parent [{Parent.Name}] state to ChildOccupied");
                     }
                     else
                     {
-                        Console.WriteLine("Unable to update child state");
+                        logger.Info($"{Domains.HomeAutomation_HomeGenie} Unable to update child state");
                     }
                 });
 
@@ -74,11 +81,8 @@ namespace HomeGenie.Data
 
             stateMachine.OnUnhandledTrigger((state, trigger) =>
             {
-                Console.WriteLine("Unhandled: '{0}' state, '{1}' trigger!");
+                logger.Info($"{Domains.HomeAutomation_HomeGenie} Unhandled Trigger: [{trigger}] state: [{state}]");
             });
-
-            // Quick test to sanity check my logic
-            //Console.WriteLine(stateMachine.ToDotGraph());
 
             return stateMachine;
         }
@@ -99,11 +103,11 @@ namespace HomeGenie.Data
             // previous way of testing
             // if (OccupancyState != State.Occupied && OccupancyState != State.ChildOccupied) return;
 
-            Console.WriteLine($"Child [{Name}] Occupied, setting parent [{Parent.Name}] state to ChildOccupied");
+            logger.Info($"{Domains.HomeAutomation_HomeGenie} Child [{Name}] Occupied, setting parent [{Parent.Name}] state to ChildOccupied");
 
             if (!Parent.TryUpdateState(Trigger.ChildOccupied))
             {
-                Console.WriteLine("Unable to update child state");
+                logger.Info($"{Domains.HomeAutomation_HomeGenie} Unable to update child state");
             }
         }
 
@@ -112,7 +116,7 @@ namespace HomeGenie.Data
         /// </summary>
         private void ResetTimer()
         {
-            Console.WriteLine($"[{Name}] Occupancy timer restarting");
+            logger.Info($"{Domains.HomeAutomation_HomeGenie} [{Name}] Occupancy timer restarting");
             occupancyTimer.Stop();
             occupancyTimer.Start();
         }
@@ -140,15 +144,15 @@ namespace HomeGenie.Data
                 occupancyTimer.Stop();
                 IsTimerRunning = false;
 
-                Console.WriteLine($"[{Name}] Occupancy timer expired and removed");
+                logger.Info($"{Domains.HomeAutomation_HomeGenie} [{Name}] Occupancy timer expired and removed");
                 if (stateMachine.IsInState(OccupancyState.Occupied))
                 {
-                    Console.WriteLine("[{0}] currently in state [{1}] - firing OccupancyTimerExpires trigger", Name, stateMachine.State);
+                    logger.Info($"{Domains.HomeAutomation_HomeGenie} [{Name}] currently in state [{stateMachine.State}] - firing OccupancyTimerExpires trigger");
                     stateMachine.Fire(Trigger.OccupancyTimerExpires);
                 }
             };
             occupancyTimer.Start();
-            Console.WriteLine($"[{Name}] Occupancy timer started");
+            logger.Info($"{Domains.HomeAutomation_HomeGenie} [{Name}] Occupancy timer started");
         }
 
         /// <summary>

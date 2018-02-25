@@ -54,7 +54,7 @@ namespace HomeGenie.Automation.Scripting
             MqttClient = new MqttClientHelper();
             KnxClient = new KnxClientHelper();
             Scheduler = new SchedulerHelper(hgService);
-            Locations = new LocationHelper();
+            Locations = new LocationHelper(hgService.Locations);
         }
 
         public ModulesManager Modules
@@ -65,6 +65,11 @@ namespace HomeGenie.Automation.Scripting
             }
         }
 
+        public LocationHelper Locations
+        {
+            get; private set;
+        }
+        
         public SettingsHelper Settings
         {
             get

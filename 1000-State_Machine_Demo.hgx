@@ -8,37 +8,39 @@ Program.AddVirtualModule ( "wallis", "2", "Switch", "");
 Program.AddVirtualModule ( "wallis", "3", "Switch", "");
 return true;
 </ScriptCondition>
-  <ScriptSource>List&lt;HomeGenie.Data.Location&gt; locations = new List&lt;Location&gt;();
-locations.Add(new Location(null) { Name = "Home" });
-
-
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "home")) { Name = "House" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "home")) { Name = "Garden" });
-
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "garden")) { Name = "Rear Garden" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "garden")) { Name = "Front Garden" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "garden")) { Name = "Side Garden" });
-
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "home")) { Name = "House" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "house")) { Name = "Upstairs" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "house")) { Name = "Downstairs" });
-
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Front Bedroom" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Back Bedroom" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Office" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Bathroom" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Upstairs Hall" });
-
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "downstairs")) { Name = "Kitchen" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "downstairs")) { Name = "DownstairsHall" });
-locations.Add(new Location(locations.Find(x =&gt; x.Name == "downstairs")) { Name = "Front Room" });
+  <ScriptSource> List&lt;HomeGenie.Data.Location&gt; locations = new List&lt;Location&gt;();
+ locations.Add(new Location(null) { Name = "Home" });
+ 
+ 
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "home")) { Name = "House" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "home")) { Name = "Garden" });
+ 
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "garden")) { Name = "Rear Garden" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "garden")) { Name = "Front Garden" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "garden")) { Name = "Side Garden" });
+ 
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "home")) { Name = "House" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "house")) { Name = "Upstairs" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "house")) { Name = "Downstairs" });
+ 
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Front Bedroom" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Back Bedroom" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Office" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Bathroom" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "upstairs")) { Name = "Upstairs Hall" });
+ 
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "downstairs")) { Name = "Kitchen" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "downstairs")) { Name = "Downstairs Hall" });
+ locations.Add(new Location(locations.Find(x =&gt; x.Name == "downstairs")) { Name = "Front Room" });
 
 
 When.ModuleParameterChange( (module, parameter) =&gt;
 {
     if (parameter.Is("Status.Level") &amp;&amp; parameter.Value == "1")
     {
+      
         var moduleLocation = locations.Find(x =&gt; x.Name == module.Instance.Location);
+      	Program.Notify("Test", moduleLocation.Name);
         moduleLocation.TryUpdateState(Enums.Trigger.SensorActivity);
 
         return false;
@@ -55,8 +57,8 @@ Program.GoBackground();</ScriptSource>
   <Group>Wallis</Group>
   <Features />
   <AutoRestartEnabled>false</AutoRestartEnabled>
-  <ActivationTime>2018-02-23T17:35:35.4084628Z</ActivationTime>
-  <TriggerTime>2018-02-23T17:35:35.4534735Z</TriggerTime>
+  <ActivationTime>2018-02-25T21:00:46.9021639Z</ActivationTime>
+  <TriggerTime>2018-02-25T21:00:47.0207398Z</TriggerTime>
   <Type>CSharp</Type>
   <IsEnabled>true</IsEnabled>
 </ProgramBlock>
